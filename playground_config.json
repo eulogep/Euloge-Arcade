@@ -1,0 +1,86 @@
+{
+  "schema": [
+    {
+      "name": "playerSpeed",
+      "type": "number",
+      "label": "Hacker Speed",
+      "default": 6.2,
+      "min": 3.0,
+      "max": 10.0,
+      "step": 0.2
+    },
+    {
+      "name": "playerJumpForce",
+      "type": "number",
+      "label": "Jump Impulse",
+      "default": -12.4,
+      "min": -18.0,
+      "max": -8.0,
+      "step": 0.2
+    },
+    {
+      "name": "playerDoubleJumpForce",
+      "type": "number",
+      "label": "Double Jump Impulse",
+      "default": -11.0,
+      "min": -16.0,
+      "max": -7.0,
+      "step": 0.2
+    },
+    {
+      "name": "maxIntegrity",
+      "type": "number",
+      "label": "Max Integrity HP",
+      "default": 100,
+      "min": 50,
+      "max": 200,
+      "step": 10
+    },
+    {
+      "name": "startingLives",
+      "type": "number",
+      "label": "Starting Lives",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "step": 1
+    },
+    {
+      "name": "fragmentScoreValue",
+      "type": "number",
+      "label": "Points per Fragment",
+      "default": 100,
+      "min": 50,
+      "max": 500,
+      "step": 25
+    },
+    {
+      "name": "defaultMusicVolume",
+      "type": "number",
+      "label": "Default Music Volume",
+      "default": 0.5,
+      "min": 0,
+      "max": 1,
+      "step": 0.1
+    },
+    {
+      "name": "defaultSfxVolume",
+      "type": "number",
+      "label": "Default SFX Volume",
+      "default": 0.6,
+      "min": 0,
+      "max": 1,
+      "step": 0.1
+    }
+  ],
+  "values": {
+    "playerSpeed": 6.2,
+    "playerJumpForce": -12.4,
+    "playerDoubleJumpForce": -11.0,
+    "maxIntegrity": 100,
+    "startingLives": 3,
+    "fragmentScoreValue": 100,
+    "defaultMusicVolume": 0.5,
+    "defaultSfxVolume": 0.6
+  }
+}

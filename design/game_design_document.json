@@ -1,0 +1,63 @@
+{
+  "title": "System Breach v2.0",
+  "hook": "Infiltrate cyber grids collect data",
+  "game_overview": "Challenging cyberpunk arcade platformer with 3 sectors, multi-phase bosses, timed laser grids, moving platforms, Cyber Blaster combat, S-Rank arcade scoring, and unlockable Time Attack.",
+  "artstyle": "cyberpunk-neon",
+  "genre": "platformer",
+  "winning_condition": "Clear all 3 sectors and purge the CORE-OMEGA mainframe boss.",
+  "losing_condition": "Player health drops to 0 from hazards or enemies.",
+  "player_mode": "single_player",
+  "supported_orientations": [
+    "landscape",
+    "wide"
+  ],
+  "input_methods": [
+    "touch",
+    "keyboard"
+  ],
+  "score_options": {
+    "score_type": "points",
+    "score_order": "higher_is_better"
+  },
+  "low_end_device_support": true,
+  "mobile_playable": true,
+  "tv_playable": false,
+  "language": [
+    "en"
+  ],
+  "content_descriptors": [],
+  "controls": [
+    {
+      "input": "A / D / Left / Right Arrow",
+      "action": "Move Left / Right"
+    },
+    {
+      "input": "W / Up Arrow / Space",
+      "action": "Jump / Double Jump"
+    },
+    {
+      "input": "J / X / F / Mouse Click",
+      "action": "Fire Cyber Blaster"
+    },
+    {
+      "input": "P / Esc",
+      "action": "Pause Game"
+    },
+    {
+      "input": "R",
+      "action": "Respawn at Checkpoint"
+    }
+  ],
+  "sections": [
+    {
+      "title": "Core Mechanics",
+      "content": "1. Multi-Stage Jump: Standard grounded leap with smooth mid-air double jump emitting digital particle pulses. 2. Collision & Movement: Snappy AABB physics with dedicated slope/ledge tolerances, coyote time (0.12s), and jump buffering (0.1s) for zero input lag. 3. Data Decryption Scoring: Collectible data fragments boosting score. 4. Dynamic Hazard Patrols: Predictable drone patrol arcs and timed laser grids with fair telegraphing. 5. Checkpoint Terminals: Working physical checkpoints that reliably preserve level progress and HP upon respawn.",
+      "summary": "Acrobatic hacker movement and interactive systems."
+    },
+    {
+      "title": "Structural Integrity",
+      "content": "Modular state machine architecture: 1. Main Menu with animated cyber backdrop, Play, Level Select, and How to Play/Tutorial modal. 2. In-Game Pause System (ESC / Pause icon) allowing instantaneous Resume, Restart, or Return to Title. 3. Three distinct playable levels with validated win paths: Level 1 (Firewall Perimeter - Introductory platforming & basic drones), Level 2 (Subroutine Core - Moving platforms, laser traps, dual checkpoints), Level 3 (Mainframe Breach - Advanced drone gauntlet, descending hazards, final portal breach). 4. Victory Screen with stats recap and direct replay options.",
+      "summary": "Seamless menu, pause flow, tutorial, and modular 3-level progression."
+    }
+  ]
+}
