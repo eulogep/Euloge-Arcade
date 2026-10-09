@@ -177,7 +177,7 @@ export function Header() {
     <header
       className={cn(
         'sticky top-0 z-40 transition-colors duration-300',
-        scrolled ? 'glass border-x-0 border-t-0' : 'bg-transparent',
+        scrolled ? 'glass border-x-0 border-t-0 !bg-bg/90' : 'bg-transparent',
       )}>
       <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
         Aller au contenu

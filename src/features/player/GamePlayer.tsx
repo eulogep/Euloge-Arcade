@@ -215,8 +215,10 @@ export function GamePlayer({game, autoStart = false}: {game: Game; autoStart?: b
       className={cn(
         'relative overflow-hidden bg-black',
         isFull ? 'fixed inset-0 z-[90] h-[100dvh] w-screen rounded-none' : 'rounded-2xl border border-line-soft shadow-card',
+        // Portrait games (e.g. the 10:11 Lichess widget) get a centered, height-bounded frame.
+        !isFull && game.orientation === 'portrait' && 'mx-auto max-w-[min(100%,calc(78vh*10/11))]',
       )}>
-      <div className={cn('relative w-full', isFull ? 'h-full' : game.orientation === 'portrait' ? 'aspect-[3/4] max-h-[80vh]' : 'aspect-video')}>
+      <div className={cn('relative w-full', isFull ? 'h-full' : game.orientation === 'portrait' ? 'aspect-[10/11]' : 'aspect-video')}>
         {state.phase === 'idle' ? (
           <button type="button" onClick={start} className="group absolute inset-0 block w-full" aria-label={`Lancer ${game.title}`}>
             <CoverImage game={game} src={game.bannerUrl ?? game.coverUrl} className="absolute inset-0 h-full w-full" eager />
@@ -298,7 +300,7 @@ export function GamePlayer({game, autoStart = false}: {game: Game; autoStart?: b
             <button type="button" onClick={start} className="btn-ghost h-9 min-h-0 px-2.5 text-xs" aria-label="Redémarrer le jeu">
               <RotateCcw size={16} /> <span className="hidden sm:inline">Redémarrer</span>
             </button>
-            <p className="hidden truncate text-xs text-ink-faint md:block">
+            <p className={cn('hidden truncate text-xs text-ink-faint', game.orientation !== 'portrait' && 'md:block')}>
               Clique dans le jeu pour le contrôler au clavier{isFull ? ' · Échap pour quitter le plein écran' : ''}
             </p>
           </div>
