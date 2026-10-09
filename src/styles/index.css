@@ -144,3 +144,54 @@
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+
+/* Used by inline-styled progress bars (hero autoplay). */
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Intro: monogram draw-in (see IntroSplash) */
+@keyframes ea-draw {
+  from {
+    stroke-dashoffset: 260;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes ea-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes ea-flare {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+.ea-intro .ea-logo-frame {
+  stroke-dasharray: 260;
+  animation: ea-draw 0.9s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+.ea-intro .ea-logo-e {
+  animation: ea-pop 0.45s 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.ea-intro .ea-logo-pulse {
+  animation: ea-pop 0.45s 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}

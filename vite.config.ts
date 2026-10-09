@@ -34,6 +34,8 @@ export default defineConfig({
   resolve: {
     alias: {'@': resolve(__dirname, 'src')},
   },
+  server: {port: 5180, strictPort: true},
+  preview: {port: 4180, strictPort: true},
   build: {
     target: 'es2022',
     rollupOptions: {

@@ -41,6 +41,8 @@ export function usePlayground() {
     };
 
     const initSDK = async () => {
+      // Euloge Arcade: the Playground SDK (and its dev UI) is not used on the platform.
+      if ((window as any).__EULOGE_ARCADE__ === true) return;
       try {
         const isSandboxPreview =
           window.location.hostname === 'test.com' ||

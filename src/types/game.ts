@@ -87,6 +87,7 @@ export interface Game {
   publishedAt: string | null;
   linkStatus: LinkStatus;
   linkCheckedAt: string | null;
+  linkCheckDetail: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -118,6 +119,7 @@ export interface GameRow {
   published_at: string | null;
   link_status: LinkStatus;
   link_checked_at: string | null;
+  link_check_detail?: string | null;
   created_at: string;
   updated_at: string;
 }

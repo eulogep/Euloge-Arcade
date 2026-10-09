@@ -4,11 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="robots" content="noindex" />
+    <!-- Marker checked by the Euloge Arcade GamePlayer to detect a missing game (SPA fallback). -->
+    <meta name="euloge-arcade-game" content="system-breach" />
     <title>System Breach — Euloge Arcade</title>
     <script>
-      // On Euloge Arcade the Google Playground SDK is not needed: use the bundled local stub
-      // so no third-party script is loaded.
-      window.__PLAYGROUND_PREVIEW__ = true;
+      // On Euloge Arcade the Google Playground SDK is disabled entirely:
+      // no third-party script and no SDK overlay UI.
+      window.__EULOGE_ARCADE__ = true;
     </script>
   </head>
   <body style="margin:0;background:#050714">
