@@ -34,8 +34,9 @@ export default defineConfig({
   resolve: {
     alias: {'@': resolve(__dirname, 'src')},
   },
-  server: {port: 5180, strictPort: true},
-  preview: {port: 4180, strictPort: true},
+  // host.docker.internal: lets the local check-links Edge Function (Docker) reach the dev server.
+  server: {host: '127.0.0.1', port: 5180, strictPort: true, allowedHosts: ['host.docker.internal']},
+  preview: {host: '127.0.0.1', port: 4180, strictPort: true},
   build: {
     target: 'es2022',
     rollupOptions: {

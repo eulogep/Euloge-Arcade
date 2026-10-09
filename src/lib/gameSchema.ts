@@ -91,7 +91,8 @@ export const gameInputSchema = z
         ctx.addIssue({code: 'custom', path: [key], message: 'URL https:// ou chemin local requis.'});
       }
     }
-    if (!LICENSES_ALLOWED_FOR_MODE[g.launch_mode].includes(g.license_status)) {
+    // 'unverified' is allowed for drafts in any mode; publishing it is refused below.
+    if (g.license_status !== 'unverified' && !LICENSES_ALLOWED_FOR_MODE[g.launch_mode].includes(g.license_status)) {
       ctx.addIssue({
         code: 'custom',
         path: ['license_status'],

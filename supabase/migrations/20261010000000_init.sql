@@ -173,7 +173,7 @@ begin
     if new.launch_url !~ '^/games/[a-z0-9-]+/[A-Za-z0-9._/-]*$' then
       raise exception 'Un jeu hébergé doit pointer vers /games/<slug>/…' using errcode = '22023';
     end if;
-    if new.license_status not in ('owned', 'open_source') then
+    if new.license_status not in ('owned', 'open_source', 'unverified') then
       raise exception 'Hébergement interdit sans droits (owned/open_source)' using errcode = '22023';
     end if;
   elsif new.launch_mode = 'embed' then
@@ -187,7 +187,7 @@ begin
     ) then
       raise exception 'Domaine % absent de la liste des intégrations autorisées', host using errcode = '22023';
     end if;
-    if new.license_status not in ('owned', 'open_source', 'embed_permitted') then
+    if new.license_status not in ('owned', 'open_source', 'embed_permitted', 'unverified') then
       raise exception 'Intégration interdite sans autorisation du fournisseur' using errcode = '22023';
     end if;
   else
@@ -206,6 +206,7 @@ begin
     raise exception 'source_url doit utiliser https://' using errcode = '22023';
   end if;
 
+  -- 'unverified' is accepted for drafts in every mode, but can never be published.
   if new.status = 'published' then
     if new.license_status = 'unverified' then
       raise exception 'Impossible de publier un jeu dont les droits ne sont pas vérifiés' using errcode = '22023';
