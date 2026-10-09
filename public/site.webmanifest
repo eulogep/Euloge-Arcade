@@ -1,0 +1,14 @@
+{
+  "name": "Euloge Arcade",
+  "short_name": "Euloge Arcade",
+  "description": "Plateforme de jeux sur navigateur — Created by Euloge",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070914",
+  "theme_color": "#070914",
+  "icons": [
+    {"src": "/brand/favicon.svg", "sizes": "any", "type": "image/svg+xml"},
+    {"src": "/brand/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"},
+    {"src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}

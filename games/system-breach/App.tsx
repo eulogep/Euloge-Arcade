@@ -46,6 +46,7 @@ import {
   usePlaygroundGameLifecycle,
   useRpc,
 } from './utils/usePlayground';
+import {reportRunToPlatform} from './platformBridge';
 import {
   SpriteActionConfig,
   SpriteAnimationState,
@@ -1181,6 +1182,13 @@ export default function App() {
         setRecords(next);
       }
       setNewRecord({score: scoreRecord, time: timeRecord});
+      reportRunToPlatform({
+        score: gameState.score,
+        timeElapsed: gameState.timeElapsed,
+        victory: gameState.status === 'VICTORY',
+        startLevel: runStartLevelRef.current,
+        deaths: gameState.deaths ?? 0,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState.status]);

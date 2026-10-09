@@ -1,0 +1,2 @@
+# SPA fallback (Netlify / Cloudflare Pages). Static files such as /games/* are served first.
+/*    /index.html   200

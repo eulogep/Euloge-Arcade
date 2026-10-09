@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>%BRAND_NAME% — %BRAND_TAGLINE%</title>
+    <meta name="description" content="%BRAND_DESCRIPTION%" />
+    <meta name="author" content="%BRAND_CREATOR%" />
+    <meta name="generator" content="%BRAND_SIGNATURE%" />
+    <meta name="theme-color" content="%BRAND_THEME_COLOR%" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href="%BRAND_SITE_URL%/" />
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="%BRAND_NAME%" />
+    <meta property="og:title" content="%BRAND_NAME%" />
+    <meta property="og:description" content="%BRAND_DESCRIPTION%" />
+    <meta property="og:url" content="%BRAND_SITE_URL%/" />
+    <meta property="og:image" content="%BRAND_SITE_URL%/brand/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="%BRAND_NAME%" />
+    <meta name="twitter:description" content="%BRAND_DESCRIPTION%" />
+    <meta name="twitter:image" content="%BRAND_SITE_URL%/brand/og-image.png" />
+
+    <script>
+      // Apply saved theme/motion before first paint to avoid a flash.
+      try {
+        var s = JSON.parse(localStorage.getItem('ea:settings') || '{}');
+        if (s.theme === 'light') document.documentElement.dataset.theme = 'light';
+        if (s.reducedMotion) document.documentElement.dataset.motion = 'reduced';
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>%BRAND_NAME% nécessite JavaScript pour fonctionner.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

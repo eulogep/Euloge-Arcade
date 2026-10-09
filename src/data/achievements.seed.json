@@ -1,0 +1,8 @@
+[
+  {"id": "first-launch", "title": "Premier lancement", "description": "Lance ton premier jeu sur Euloge Arcade.", "icon": "rocket", "game_slug": null, "sort": 1},
+  {"id": "explorer", "title": "Explorateur", "description": "Lance 3 jeux différents.", "icon": "compass", "game_slug": null, "sort": 2},
+  {"id": "curator", "title": "Collectionneur", "description": "Ajoute 3 jeux à tes favoris.", "icon": "heart", "game_slug": null, "sort": 3},
+  {"id": "system-breach-clear", "title": "Mainframe libéré", "description": "Termine System Breach.", "icon": "trophy", "game_slug": "system-breach", "sort": 10},
+  {"id": "system-breach-flawless", "title": "Sans une égratignure", "description": "Termine System Breach depuis le secteur 01 sans perdre une seule vie.", "icon": "shield", "game_slug": "system-breach", "sort": 11},
+  {"id": "system-breach-5k", "title": "Hacker d'élite", "description": "Atteins 5 000 points dans une partie de System Breach.", "icon": "flame", "game_slug": "system-breach", "sort": 12}
+]
