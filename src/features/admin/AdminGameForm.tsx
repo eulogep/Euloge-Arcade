@@ -74,13 +74,48 @@ const MODE_HELP = {
   external: "Mode C — bouton « Ouvrir le jeu » vers le site officiel, sans iframe.",
 };
 
-function Field({label, error, children, hint}: {label: string; error?: string; children: ReactNode; hint?: string}) {
-  return (
-    <div>
-      <span className="label">{label}</span>
-      {children}
+/**
+ * Single control: <label htmlFor> so the visible text is its accessible name.
+ * Groups (several controls): <fieldset> + <legend>.
+ */
+function Field({
+  label,
+  error,
+  children,
+  hint,
+  group = false,
+  htmlFor,
+}: {
+  label: string;
+  error?: string;
+  children: ReactNode;
+  hint?: string;
+  group?: boolean;
+  /** id of the single control this label names. */
+  htmlFor?: string;
+}) {
+  const footer = (
+    <>
       {hint && !error && <p className="mt-1 text-xs text-ink-faint">{hint}</p>}
       {error && <p className="mt-1 text-xs font-semibold text-danger">{error}</p>}
+    </>
+  );
+  if (group) {
+    return (
+      <fieldset>
+        <legend className="label">{label}</legend>
+        {children}
+        {footer}
+      </fieldset>
+    );
+  }
+  return (
+    <div>
+      <label htmlFor={htmlFor} className="label">
+        {label}
+      </label>
+      {children}
+      {footer}
     </div>
   );
 }
@@ -172,10 +207,10 @@ export default function AdminGameForm() {
   };
 
   const textInput = (key: 'slug' | 'title' | 'tagline' | 'launch_url', props: Record<string, unknown> = {}) => (
-    <input className="input" value={(form[key] as string) ?? ''} onChange={(e) => set(key, e.target.value)} aria-invalid={!!errors[key]} {...props} />
+    <input id={`f-${key}`} className="input" value={(form[key] as string) ?? ''} onChange={(e) => set(key, e.target.value)} aria-invalid={!!errors[key]} {...props} />
   );
-  const nullableInput = (key: 'cover_url' | 'banner_url' | 'source_url' | 'developer') => (
-    <input className="input" value={form[key] ?? ''} onChange={(e) => set(key, e.target.value || null)} aria-invalid={!!errors[key]} />
+  const nullableInput = (key: 'cover_url' | 'banner_url' | 'source_url' | 'developer', ariaLabel?: string) => (
+    <input id={`f-${key}`} className="input" value={form[key] ?? ''} onChange={(e) => set(key, e.target.value || null)} aria-invalid={!!errors[key]} aria-label={ariaLabel} />
   );
 
   return (
@@ -202,23 +237,23 @@ export default function AdminGameForm() {
 
         <section className="glass grid gap-5 rounded-2xl p-5 md:grid-cols-2">
           <h2 className="font-display text-lg font-bold md:col-span-2">Identité</h2>
-          <Field label="Titre" error={errors.title}>{textInput('title', {maxLength: 80})}</Field>
-          <Field label="Slug (URL)" error={errors.slug} hint="minuscules-et-tirets">{textInput('slug', {maxLength: 60})}</Field>
+          <Field label="Titre" error={errors.title} htmlFor="f-title">{textInput('title', {maxLength: 80})}</Field>
+          <Field label="Slug (URL)" error={errors.slug} hint="minuscules-et-tirets" htmlFor="f-slug">{textInput('slug', {maxLength: 60})}</Field>
           <div className="md:col-span-2">
-            <Field label="Accroche" error={errors.tagline}>{textInput('tagline', {maxLength: 140})}</Field>
+            <Field label="Accroche" error={errors.tagline} htmlFor="f-tagline">{textInput('tagline', {maxLength: 140})}</Field>
           </div>
           <div className="md:col-span-2">
-            <Field label="Description" error={errors.description}>
-              <textarea className="input min-h-[120px] py-2" value={form.description} onChange={(e) => set('description', e.target.value)} maxLength={4000} />
+            <Field label="Description" error={errors.description} htmlFor="f-description">
+              <textarea id="f-description" className="input min-h-[120px] py-2" value={form.description} onChange={(e) => set('description', e.target.value)} maxLength={4000} />
             </Field>
           </div>
           <div className="md:col-span-2">
-            <Field label="Comment jouer" error={errors.instructions}>
-              <textarea className="input min-h-[90px] py-2" value={form.instructions} onChange={(e) => set('instructions', e.target.value)} maxLength={4000} />
+            <Field label="Comment jouer" error={errors.instructions} htmlFor="f-instructions">
+              <textarea id="f-instructions" className="input min-h-[90px] py-2" value={form.instructions} onChange={(e) => set('instructions', e.target.value)} maxLength={4000} />
             </Field>
           </div>
           <div className="md:col-span-2">
-            <Field label="Genres" error={errors.genre}>
+            <Field label="Genres" error={errors.genre} group>
               <div className="flex flex-wrap gap-2">
                 {GENRES.map((g: Genre) => (
                   <label key={g} className="chip cursor-pointer has-[:checked]:border-accent/60 has-[:checked]:bg-accent/15">
@@ -234,9 +269,9 @@ export default function AdminGameForm() {
               </div>
             </Field>
           </div>
-          <Field label="Développeur / éditeur" error={errors.developer}>{nullableInput('developer')}</Field>
-          <Field label="Orientation">
-            <select className="input" value={form.orientation} onChange={(e) => set('orientation', e.target.value as GameInput['orientation'])}>
+          <Field label="Développeur / éditeur" error={errors.developer} htmlFor="f-developer">{nullableInput('developer')}</Field>
+          <Field label="Orientation" htmlFor="f-orientation">
+            <select id="f-orientation" className="input" value={form.orientation} onChange={(e) => set('orientation', e.target.value as GameInput['orientation'])}>
               <option value="any">Indifférente</option>
               <option value="landscape">Paysage</option>
               <option value="portrait">Portrait</option>
@@ -247,9 +282,9 @@ export default function AdminGameForm() {
         <section className="glass grid gap-5 rounded-2xl p-5 md:grid-cols-2">
           <h2 className="font-display text-lg font-bold md:col-span-2">Visuels</h2>
           {(['cover_url', 'banner_url'] as const).map((key) => (
-            <Field key={key} label={key === 'cover_url' ? 'Couverture (16:10)' : 'Bannière (21:9)'} error={errors[key]} hint="PNG, JPEG, WebP ou AVIF · 2 Mo max · pas de SVG">
+            <Field key={key} group label={key === 'cover_url' ? 'Couverture (16:10)' : 'Bannière (21:9)'} error={errors[key]} hint="PNG, JPEG, WebP ou AVIF · 2 Mo max · pas de SVG">
               <div className="flex gap-2">
-                {nullableInput(key)}
+                {nullableInput(key, key === 'cover_url' ? 'URL de la couverture' : 'URL de la bannière')}
                 <label className="btn-secondary cursor-pointer">
                   <Upload size={16} /> {uploading === key ? '…' : 'Envoyer'}
                   <input type="file" accept="image/png,image/jpeg,image/webp,image/avif" className="sr-only" onChange={(e) => void upload(key, e.target.files?.[0])} />
@@ -262,8 +297,9 @@ export default function AdminGameForm() {
 
         <section className="glass grid gap-5 rounded-2xl p-5 md:grid-cols-2">
           <h2 className="font-display text-lg font-bold md:col-span-2">Lancement, source &amp; licence</h2>
-          <Field label="Mode de lancement" hint={MODE_HELP[form.launch_mode]}>
+          <Field label="Mode de lancement" hint={MODE_HELP[form.launch_mode]} htmlFor="f-launch_mode">
             <select
+              id="f-launch_mode"
               className="input"
               value={form.launch_mode}
               onChange={(e) => {
@@ -277,12 +313,12 @@ export default function AdminGameForm() {
               <option value="external">C — Externe (site officiel)</option>
             </select>
           </Field>
-          <Field label="URL de lancement" error={errors.launch_url} hint={form.launch_mode === 'hosted' ? '/games/<slug>/index.html' : 'https://…'}>
+          <Field label="URL de lancement" error={errors.launch_url} hint={form.launch_mode === 'hosted' ? '/games/<slug>/index.html' : 'https://…'} htmlFor="f-launch_url">
             {textInput('launch_url')}
           </Field>
-          <Field label="Source / site officiel" error={errors.source_url}>{nullableInput('source_url')}</Field>
-          <Field label="Statut de licence" error={errors.license_status} hint={LICENSE_HELP[form.license_status]}>
-            <select className="input" value={form.license_status} onChange={(e) => set('license_status', e.target.value as GameInput['license_status'])}>
+          <Field label="Source / site officiel" error={errors.source_url} htmlFor="f-source_url">{nullableInput('source_url')}</Field>
+          <Field label="Statut de licence" error={errors.license_status} hint={LICENSE_HELP[form.license_status]} htmlFor="f-license_status">
+            <select id="f-license_status" className="input" value={form.license_status} onChange={(e) => set('license_status', e.target.value as GameInput['license_status'])}>
               {LICENSE_STATUSES.map((l) => (
                 <option key={l} value={l} disabled={l !== 'unverified' && !allowedLicenses.includes(l)}>
                   {l}
@@ -291,8 +327,8 @@ export default function AdminGameForm() {
             </select>
           </Field>
           <div className="md:col-span-2">
-            <Field label="Notes de licence (preuve d'autorisation, licence, crédits)" error={errors.license_notes}>
-              <textarea className="input min-h-[80px] py-2" value={form.license_notes ?? ''} onChange={(e) => set('license_notes', e.target.value || null)} maxLength={2000} />
+            <Field label="Notes de licence (preuve d'autorisation, licence, crédits)" error={errors.license_notes} htmlFor="f-license_notes">
+              <textarea id="f-license_notes" className="input min-h-[80px] py-2" value={form.license_notes ?? ''} onChange={(e) => set('license_notes', e.target.value || null)} maxLength={2000} />
             </Field>
           </div>
         </section>
@@ -343,14 +379,14 @@ export default function AdminGameForm() {
 
         <section className="glass grid gap-5 rounded-2xl p-5 md:grid-cols-3">
           <h2 className="font-display text-lg font-bold md:col-span-3">Publication</h2>
-          <Field label="Statut" error={errors.status}>
-            <select className="input" value={form.status} onChange={(e) => set('status', e.target.value as GameInput['status'])}>
+          <Field label="Statut" error={errors.status} htmlFor="f-status">
+            <select id="f-status" className="input" value={form.status} onChange={(e) => set('status', e.target.value as GameInput['status'])}>
               <option value="draft">Brouillon</option>
               <option value="published">Publié</option>
               <option value="unpublished">Retiré</option>
             </select>
           </Field>
-          <Field label="À la une" error={errors.featured_rank} hint="Rang 1 = premier du carrousel">
+          <Field label="À la une" error={errors.featured_rank} hint="Rang 1 = premier du carrousel" group>
             <div className="flex items-center gap-2">
               <input type="checkbox" checked={form.featured} onChange={(e) => set('featured', e.target.checked)} aria-label="Mettre à la une" />
               <input
@@ -364,7 +400,7 @@ export default function AdminGameForm() {
               />
             </div>
           </Field>
-          <Field label="Scores" hint="Uniquement pour les jeux hébergés qui envoient leurs scores à la plateforme.">
+          <Field label="Scores" hint="Uniquement pour les jeux hébergés qui envoient leurs scores à la plateforme." group>
             <label className="flex h-11 items-center gap-2 text-sm">
               <input type="checkbox" checked={form.supports_scores} onChange={(e) => set('supports_scores', e.target.checked)} /> Le jeu transmet ses scores
             </label>

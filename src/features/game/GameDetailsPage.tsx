@@ -220,16 +220,14 @@ export default function GameDetailsPage() {
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wider text-ink-faint">Statut des droits</dt>
                   <dd>{LICENSE_LABELS[game.licenseStatus]}</dd>
+                  {game.licenseNotes && <dd className="mt-1 text-xs leading-relaxed text-ink-muted">{game.licenseNotes}</dd>}
                 </div>
-                {game.licenseNotes && <dd className="text-xs leading-relaxed text-ink-muted">{game.licenseNotes}</dd>}
-                {game.sourceUrl && (
-                  <div>
-                    <a href={game.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-accent-3 hover:underline">
-                      Site officiel <ExternalLink size={14} />
-                    </a>
-                  </div>
-                )}
               </dl>
+              {game.sourceUrl && (
+                <a href={game.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm text-accent-3 hover:underline">
+                  Site officiel <ExternalLink size={14} />
+                </a>
+              )}
               {isThirdParty && (
                 <p className="mt-4 border-t pt-4 text-xs text-ink-faint border-line-soft">
                   Ce jeu, son nom et ses contenus appartiennent à leurs auteurs. Euloge Arcade n'en revendique aucun droit et n'est pas affilié à
