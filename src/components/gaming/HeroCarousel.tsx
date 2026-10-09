@@ -26,6 +26,9 @@ export function HeroCarousel({games}: {games: Game[]}) {
   const [paused, setPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const autoplay = !reduced && !paused && !hovered && games.length > 1;
+  // Slides already shown stay mounted so going back doesn't flash.
+  const [visited, setVisited] = useState<Set<number>>(() => new Set([0]));
+  useEffect(() => setVisited((v) => (v.has(index) ? v : new Set(v).add(index))), [index]);
 
   useEffect(() => {
     if (!autoplay) return;
@@ -47,7 +50,11 @@ export function HeroCarousel({games}: {games: Game[]}) {
       onBlurCapture={() => setHovered(false)}>
       {/* Slides (backgrounds) */}
       <div className="absolute inset-0 -z-10">
-        {games.map((g, i) => (
+        {games.map((g, i) => {
+          // Only the current and next banners are mounted: no hidden slide downloads.
+          const near = i === index || i === (index + 1) % games.length;
+          if (!near && !visited.has(i)) return null;
+          return (
           <div
             key={g.id}
             aria-hidden={i !== index}
@@ -59,7 +66,8 @@ export function HeroCarousel({games}: {games: Game[]}) {
               className={cn('h-full w-full', i === index && !reduced && 'animate-ken-burns')}
             />
           </div>
-        ))}
+          );
+        })}
         <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-bg/10" />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-bg/40" />
       </div>

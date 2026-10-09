@@ -111,7 +111,7 @@ export default function GameDetailsPage() {
 
   if (catalog.status === 'loading') {
     return (
-      <div className="container-page pt-8">
+      <div className="container-page pt-24">
         <Skeleton className="aspect-video w-full" />
       </div>
     );
@@ -145,7 +145,7 @@ export default function GameDetailsPage() {
   return (
     <div>
       {/* Banner */}
-      <div className="relative -mt-16 h-[260px] overflow-hidden sm:h-[340px]">
+      <div className="relative h-[260px] overflow-hidden sm:h-[340px]">
         <CoverImage game={game} src={game.bannerUrl ?? game.coverUrl} eager className="h-full w-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/20" />
       </div>

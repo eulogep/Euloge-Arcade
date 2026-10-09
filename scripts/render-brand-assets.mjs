@@ -127,7 +127,7 @@ async function shot(page, html, out, w, h, type = 'png') {
   await page.goto(pathToFileURL(file).href);
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(150);
-  await page.screenshot({path: resolve(root, out), type, ...(type === 'jpeg' ? {quality: 84} : {})});
+  await page.screenshot({path: resolve(root, out), type, ...(type === 'jpeg' ? {quality: 78} : {})});
   console.log('✓', out);
 }
 
@@ -137,7 +137,8 @@ await shot(page, iconPage(180), 'public/brand/apple-touch-icon.png', 180, 180);
 await shot(page, iconPage(512), 'public/brand/icon-512.png', 512, 512);
 await shot(page, ogImage, 'public/brand/og-image.png', 1200, 630);
 for (const [slug, tpl] of Object.entries(covers)) {
-  await shot(page, base(1280, 800, tpl(1280, 800, false)), `public/covers/${slug}.jpg`, 1280, 800, 'jpeg');
-  await shot(page, base(1920, 820, tpl(1920, 820, true), '.txt{display:none}'), `public/covers/${slug}-banner.jpg`, 1920, 820, 'jpeg');
+  // Card covers are displayed at ~330 CSS px: 800px wide covers 2x screens.
+  await shot(page, base(800, 500, tpl(800, 500, false)), `public/covers/${slug}.jpg`, 800, 500, 'jpeg');
+  await shot(page, base(1600, 683, tpl(1600, 683, true), '.txt{display:none}'), `public/covers/${slug}-banner.jpg`, 1600, 683, 'jpeg');
 }
 await browser.close();

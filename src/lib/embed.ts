@@ -1,4 +1,4 @@
-import {HOSTED_PATH_RE} from '@/lib/gameSchema';
+import {HOSTED_PATH_RE} from '@/lib/rules';
 import type {Game} from '@/types/game';
 
 /**

@@ -84,7 +84,7 @@ export default function HomePage() {
   const hasActivity = favorites.size > 0 || history.length > 0;
 
   return (
-    <div className="-mt-16 space-y-14">
+    <div className="space-y-14">
       <HeroCarousel games={sections.featured.length ? sections.featured : sections.all.slice(0, 3)} />
 
       <GameRail

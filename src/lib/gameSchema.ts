@@ -1,30 +1,14 @@
 import {z} from 'zod';
+import {HOSTED_PATH_RE, isHttpsUrl, LICENSES_ALLOWED_FOR_MODE, SLUG_RE} from '@/lib/rules';
 import {GAME_STATUSES, GENRES, LAUNCH_MODES, LICENSE_STATUSES} from '@/types/game';
+
+export {HOSTED_PATH_RE, isHttpsUrl, LICENSES_ALLOWED_FOR_MODE, SLUG_RE};
 
 /**
  * Validation rules for a game, shared by the admin form, the local catalog loader
  * and tests. The same rules are enforced server-side by the `validate_game`
  * trigger in supabase/migrations (client validation is only for UX).
  */
-
-export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-/** Hosted games must live under /games/ on our own origin; no traversal, no scheme. */
-export const HOSTED_PATH_RE = /^\/games\/[a-z0-9-]+\/[a-zA-Z0-9._\-/]*$/;
-
-export function isHttpsUrl(value: string): boolean {
-  try {
-    return new URL(value).protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-/** Which license statuses allow each launch mode. Mirrors the SQL trigger. */
-export const LICENSES_ALLOWED_FOR_MODE: Record<(typeof LAUNCH_MODES)[number], readonly string[]> = {
-  hosted: ['owned', 'open_source'],
-  embed: ['owned', 'open_source', 'embed_permitted'],
-  external: ['owned', 'open_source', 'embed_permitted', 'link_only'],
-};
 
 const compatibilitySchema = z.object({
   keyboard: z.boolean(),
