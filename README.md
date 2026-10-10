@@ -66,8 +66,9 @@ La plupart des portails de jeux en ligne sont des listes de liens noyées sous l
 | **System Breach** | 🟢 Hébergé | Création originale d'Euloge |
 | **Puzzle d'échecs du jour** | 🔵 Intégré | Widget officiel proposé par Lichess |
 | **Krunker.io**, **2048**, **Lichess** | ↗️ Site officiel | Liens uniquement : ces sites refusent l'intégration |
+| **21 projets de la liste @RadiantOpti** | ↗️ Projets externes | Quake, Halo, Zombies, Skate, PES, GTA et autres ; liens incertains conservés mais signalés indisponibles |
 
-Les couvertures des jeux tiers sont des **illustrations originales** de la plateforme. Aucun logo ni visuel tiers n'est réutilisé, et ces jeux restent la propriété de leurs auteurs.
+Les jeux tiers utilisent soit une **illustration originale** de la plateforme, soit le placeholder graphique de la marque. Aucun logo ni visuel tiers n'est réutilisé, et ces jeux restent la propriété de leurs auteurs.
 
 ### System Breach
 

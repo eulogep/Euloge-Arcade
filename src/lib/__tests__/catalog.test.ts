@@ -80,7 +80,7 @@ describe('helpers', () => {
   });
 
   it('available genres only lists present genres', () => {
-    expect(availableGenres(seedGames)).not.toContain('retro');
+    expect(availableGenres([makeGame({genre: ['action']})])).toEqual(['action']);
   });
 
   it('pickRandom is deterministic with an injected RNG and safe on empty input', () => {

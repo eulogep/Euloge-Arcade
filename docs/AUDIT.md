@@ -32,6 +32,8 @@ Ce qui a été ajouté ou corrigé lors de la session précédente (le correctif
 
 Les en-têtes ont été vérifiés avec `curl` le 2026-10-10.
 
+Source de la recherche complémentaire : [publication de @RadiantOpti](https://x.com/RadiantOpti/status/2108068628793082338) et [réponse contenant les liens](https://x.com/RadiantOpti/status/2108068632991256995). X refuse parfois la consultation automatisée ; les destinations retenues ont donc été contrôlées directement.
+
 | Jeu | Droits | Intégration technique | Mode retenu |
 | --- | --- | --- | --- |
 | System Breach | Projet fourni par le propriétaire du dépôt | Code source disponible | **A — hébergé** |
@@ -39,8 +41,15 @@ Les en-têtes ont été vérifiés avec `curl` le 2026-10-10.
 | Lichess (partie complète) | Lien uniquement | `X-Frame-Options: DENY` | C — externe |
 | Krunker.io | Lien uniquement | `X-Frame-Options: SAMEORIGIN` | C — externe |
 | 2048 (play2048.co) | Lien uniquement | CSP `frame-ancestors` limitée à ses propres domaines | C — externe |
+| QuakeWorld, Quake II (q1/q2.pieter.com) | Liens uniquement | Projets non officiels et non commerciaux attribués à pieter.com et FTE QuakeWorld ; pages accessibles le 2026-10-10 | C — externe |
+| Surfd (surfd.net) | Lien uniquement | Projet crédité à @0yield ; page, commandes et crédits accessibles le 2026-10-10 | C — externe |
+| Urban Terror (ut.pieter.com) | Lien uniquement | Préservation web non officielle attribuant le jeu à FrozenSand ; page accessible le 2026-10-10 | C — externe |
+| Halo CE, Halo CE Mobile, Skate 3, Diablo, Vice City, Half-Life, WebXash | Liens uniquement | Projets exigeant ou pouvant exiger les fichiers d'une copie appartenant au joueur ; aucun fichier fourni par la plateforme | C — externe |
+| Black Ops Zombies, Skate × Rust, PES 6, Simpsons Hit & Run, RTCW | Liens uniquement | Pages tierces accessibles le 2026-10-10 ; fonctionnement complet et droits des projets non validés | C — externe |
+| Moon Zombies, Kino der Toten, Cheese Cube, Vibe Slops II | Liens conservés, lancement bloqué | Redirection vers un domaine non validé ou erreur 404 le 2026-10-10 ; entrées marquées `broken` | C — externe indisponible |
+| Quake III | Lien uniquement | La vérification a expiré ; entrée conservée avec le statut `unchecked` | C — externe non contrôlé |
 
-Aucun visuel ni logo de jeu tiers n'est réutilisé. Leurs couvertures sont des illustrations originales générées pour la plateforme.
+Aucun visuel ni logo de jeu tiers n'est réutilisé. Les entrées sans illustration originale utilisent le placeholder graphique de la plateforme.
 
 ## 5. Ce qui est réutilisé
 
