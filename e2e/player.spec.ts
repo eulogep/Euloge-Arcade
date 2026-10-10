@@ -46,7 +46,7 @@ test('Mode B — allowlisted embed is shown in a sandboxed iframe', async ({page
 test('Mode C — external game is never framed and opens the official site safely', async ({page}) => {
   await visit(page, '/jeux/krunker');
   await expect(page.locator('iframe')).toHaveCount(0);
-  const link = page.getByRole('link', {name: /Ouvrir le jeu/});
+  const link = page.getByRole('link', {name: /Ouvrir le jeu/}).first();
   await expect(link).toHaveAttribute('href', 'https://krunker.io/');
   await expect(link).toHaveAttribute('target', '_blank');
   await expect(link).toHaveAttribute('rel', /noopener/);

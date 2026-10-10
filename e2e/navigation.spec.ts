@@ -7,8 +7,7 @@ test('home shows the featured hero, discovery rails and branding', async ({page}
   await expect(page.getByRole('heading', {level: 1, name: 'System Breach'})).toBeVisible();
   await expect(page.getByRole('heading', {name: 'Nouveautés'})).toBeVisible();
   await expect(page.getByRole('heading', {name: 'FPS & action'})).toBeVisible();
-  // No retro game in the catalog: the section is hidden rather than faked.
-  await expect(page.getByRole('heading', {name: 'Jeux rétro'})).toHaveCount(0);
+  await expect(page.getByRole('heading', {name: 'Jeux rétro'})).toBeVisible();
   // No real popularity data yet: no fake "popular" section.
   await expect(page.getByRole('heading', {name: 'Jeux populaires'})).toHaveCount(0);
   await expect(page.getByText('© 2026 Euloge Arcade. All rights reserved.')).toBeVisible();
