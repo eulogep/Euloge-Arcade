@@ -37,6 +37,23 @@ Cible recommandée : **Cloudflare Pages** (site statique + `_headers`/`_redirect
 - Mettre à jour `BRAND.siteUrl` dans `src/config/brand.ts`. Cette valeur sert à l'URL canonique et aux balises Open Graph.
 - Si Supabase est auto-hébergé ou sur un domaine personnalisé, remplacer `*.supabase.co` dans la CSP de `public/_headers`.
 
+### Déploiement automatique (GitHub Actions)
+
+Le projet Cloudflare Pages `euloge-arcade` n'est pas relié à Git : c'est le job `deploy` de `.github/workflows/ci.yml` qui publie le site. Il ne tourne qu'après une fusion dans `main`, et seulement si les jobs `checks` et `database-and-e2e` ont réussi. Les pull requests ne déploient jamais rien.
+
+Secrets à définir dans GitHub (Settings → Secrets and variables → Actions) :
+
+- `CLOUDFLARE_API_TOKEN` : jeton créé dans Cloudflare (My Profile → API Tokens) avec la permission **Cloudflare Pages : Edit** ;
+- `CLOUDFLARE_ACCOUNT_ID` : l'identifiant du compte Cloudflare ;
+- `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` (facultatifs) : sans eux, le site est construit en mode local (catalogue intégré, sans comptes).
+
+Déploiement manuel de secours, sans reprendre le `.env.local` de développement :
+
+```bash
+VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= npm run build
+npx wrangler pages deploy dist --project-name euloge-arcade --branch main
+```
+
 ## 3. Avant l'ouverture au public
 
 - [ ] Compléter les mentions légales (adresse et contact de l'éditeur, hébergeur, région Supabase) dans `src/features/about/LegalPages.tsx`, et `BRAND.contactEmail`.
