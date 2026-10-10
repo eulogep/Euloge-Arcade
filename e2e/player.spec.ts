@@ -62,5 +62,7 @@ test('a game flagged as dead link is shown as unavailable', async ({page}) => {
   });
   await visit(page, '/jeux/2048');
   await expect(page.getByText(/momentanément indisponible/)).toBeVisible();
-  await expect(page.getByRole('link', {name: /Ouvrir le jeu/})).toHaveCount(0);
+  // Similar-game cards may show their own launch links: only 2048's must be gone.
+  const launch2048 = page.getByRole('link', {name: /Ouvrir le jeu/}).and(page.locator('[href="https://play2048.co/"]'));
+  await expect(launch2048).toHaveCount(0);
 });
