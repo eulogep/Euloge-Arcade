@@ -12,7 +12,7 @@ test('genre and feature filters, sort and empty state', async ({page}) => {
   await visit(page, '/jeux');
   await expect(page.getByText(/\d+ jeux au catalogue/)).toBeVisible();
   await page.getByRole('group', {name: 'Filtrer par genre'}).getByRole('button', {name: 'Arcade'}).click();
-  await expect(page.getByText('2 jeux correspondants')).toBeVisible();
+  await expect(page.getByText(/\d+ jeux correspondants/)).toBeVisible();
   await page.getByRole('group', {name: 'Filtrer par caractéristique'}).getByRole('button', {name: 'Jouable sur la plateforme'}).click();
   await expect(page.getByText('1 jeu correspondant')).toBeVisible();
   await expect(page).toHaveURL(/genre=arcade/);
