@@ -10,6 +10,9 @@ async function rest(path: string, init: RequestInit = {}) {
 
 /** Resets e2e accounts and test data on the LOCAL stack only. */
 export default async function globalSetup() {
+  // Public, backend-free journeys can opt out without weakening the default full-stack suite.
+  if (process.env.E2E_SKIP_GLOBAL_SETUP === '1') return;
+
   if (!SUPABASE_URL.includes('127.0.0.1')) throw new Error('E2E setup must only run against the local stack');
   const list = (await (await rest('/auth/v1/admin/users?per_page=200')).json()) as {users: Array<{id: string; email: string}>};
   for (const u of list.users) {

@@ -5,10 +5,18 @@ import {usePlatform} from '@/app/PlatformProvider';
 import {BRAND} from '@/config/brand';
 import {useDocumentTitle} from '@/hooks/useDocumentTitle';
 
-/**
- * Legal texts describe what is actually deployed. Fields marked « à compléter »
- * (publisher address, host) must be filled before a public launch.
- */
+const LEGAL = {
+  contactUrl: 'https://github.com/eulogep/Euloge-Arcade/issues',
+  host: {
+    name: 'Cloudflare, Inc.',
+    address: '101 Townsend Street, San Francisco, CA 94107, États-Unis',
+    phone: '+1 650 319 8930',
+    website: 'https://www.cloudflare.com/',
+    privacy: 'https://www.cloudflare.com/privacypolicy/',
+  },
+  cnilComplaint: 'https://www.cnil.fr/fr/plaintes',
+  lcen: 'https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000049568614/',
+} as const;
 
 function LegalLayout({title, updated, children}: {title: string; updated: string; children: ReactNode}) {
   useDocumentTitle(title);
@@ -23,21 +31,49 @@ function LegalLayout({title, updated, children}: {title: string; updated: string
   );
 }
 
-const TODO = <span className="rounded bg-warning/15 px-1.5 text-warning">à compléter</span>;
-
 export function LegalNoticePage() {
   return (
     <LegalLayout title="Mentions légales" updated="10 octobre 2026">
+      <p>
+        <strong>{BRAND.name}</strong> est un site personnel, gratuit et non commercial, accessible à l'adresse{' '}
+        <a href={BRAND.siteUrl} className="text-accent-3 underline">
+          {BRAND.siteUrl}
+        </a>
+        . Il ne propose ni achat, ni abonnement payant.
+      </p>
+
       <h2>Éditeur</h2>
       <p>
-        {BRAND.name} est édité par <strong>{BRAND.creator}</strong>, à titre personnel. Adresse : {TODO}. Contact :{' '}
-        {BRAND.contactEmail ? <a href={`mailto:${BRAND.contactEmail}`}>{BRAND.contactEmail}</a> : TODO}.
+        Le service est édité à titre non professionnel sous le pseudonyme <strong>{BRAND.creator}</strong>. Afin de préserver
+        l'anonymat de l'éditeur, seules les coordonnées de l'hébergeur sont rendues publiques, conformément à{' '}
+        <a href={LEGAL.lcen} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          l'article 1-1, II de la loi pour la confiance dans l'économie numérique
+        </a>
+        .
       </p>
       <p>Directeur de la publication : {BRAND.creator}.</p>
+      <p>
+        Contact électronique :{' '}
+        <a href={LEGAL.contactUrl} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          formulaire public de contact sur GitHub
+        </a>
+        . Ne publie aucune donnée personnelle ou confidentielle dans une demande publique.
+      </p>
+
       <h2>Hébergement</h2>
       <p>
-        Site statique : {TODO} (par exemple Cloudflare Pages). Base de données, authentification et fichiers : Supabase Inc. (région {TODO}).
+        Le site statique est hébergé par <strong>{LEGAL.host.name}</strong>, {LEGAL.host.address}. Téléphone :{' '}
+        <a href="tel:+16503198930" className="text-accent-3 underline">
+          {LEGAL.host.phone}
+        </a>
+        . Site :{' '}
+        <a href={LEGAL.host.website} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          cloudflare.com
+        </a>
+        .
       </p>
+      <p>Le déploiement public actuel n'active ni compte utilisateur, ni base de données distante.</p>
+
       <h2>Propriété intellectuelle</h2>
       <p>
         L'interface, le code, le logo « E », la marque {BRAND.name} et les illustrations originales de la plateforme sont protégés.{' '}
@@ -51,8 +87,19 @@ export function LegalNoticePage() {
       </p>
       <h2>Signalement</h2>
       <p>
-        Si vous êtes titulaire de droits et estimez qu'un contenu ne devrait pas apparaître sur {BRAND.name}, contactez l'éditeur : le jeu
-        concerné sera retiré du catalogue dans les meilleurs délais.
+        Si tu es titulaire de droits et estimes qu'un contenu ne devrait pas apparaître sur {BRAND.name}, utilise le{' '}
+        <a href={LEGAL.contactUrl} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          formulaire de contact
+        </a>{' '}
+        en indiquant le contenu concerné et les éléments permettant d'examiner la demande. Une demande fondée sera traitée dans les meilleurs
+        délais.
+      </p>
+
+      <h2>Responsabilité</h2>
+      <p>
+        Les informations sont fournies de bonne foi, sans garantie d'absence d'erreur ni de disponibilité continue. Les sites et jeux tiers
+        restent sous la responsabilité de leurs éditeurs respectifs ; leurs contenus, conditions et pratiques peuvent évoluer sans contrôle de{' '}
+        {BRAND.name}.
       </p>
     </LegalLayout>
   );
@@ -67,22 +114,68 @@ export function PrivacyPage() {
         d'audience, ni cookie publicitaire</strong> sur la plateforme.
       </p>
 
-      <h2>Sans compte</h2>
+      <h2>Responsable du traitement</h2>
+      <p>
+        Le responsable du traitement est l'éditeur non professionnel de {BRAND.name}, désigné sous le pseudonyme {BRAND.creator}. Pour le
+        contacter, utilise le{' '}
+        <a href={LEGAL.contactUrl} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          formulaire public sur GitHub
+        </a>{' '}
+        sans y publier de donnée personnelle : demande simplement un canal privé pour poursuivre l'échange.
+      </p>
+
+      <h2>Données conservées sur ton appareil</h2>
       <ul>
-        <li>Tes favoris, ton historique de lancement, tes scores, tes succès et tes préférences (thème, animations, recommandations) sont enregistrés <strong>uniquement dans ton navigateur</strong> (localStorage). Ils ne nous sont pas transmis.</li>
-        <li>Tu peux les effacer à tout moment en vidant les données du site dans ton navigateur ou en effaçant l'historique dans ton profil.</li>
+        <li>
+          <strong>Données :</strong> favoris, historique de lancement, scores, succès et préférences (thème, animations et recommandations).
+        </li>
+        <li>
+          <strong>Finalité :</strong> mémoriser tes choix et personnaliser l'interface sur l'appareil utilisé.
+        </li>
+        <li>
+          <strong>Stockage et destinataire :</strong> ces données restent uniquement dans le stockage local de ton navigateur (localStorage) et
+          ne sont pas transmises à {BRAND.name}.
+        </li>
+        <li>
+          <strong>Durée :</strong> jusqu'à leur suppression depuis le profil ou les réglages de ton navigateur.
+        </li>
       </ul>
+
+      <h2>Traceurs</h2>
+      <p>
+        Le stockage local sert exclusivement aux fonctionnalités que tu demandes. Aucun traceur publicitaire, outil de profilage ou mesure
+        d'audience n'est installé par {BRAND.name}. Ces éléments strictement fonctionnels ne nécessitent pas de bandeau de consentement ; tu peux
+        néanmoins les supprimer à tout moment depuis ton navigateur.
+      </p>
+
+      <h2>Hébergement et journaux techniques</h2>
+      <p>
+        Lors de l'accès au site, Cloudflare traite les données techniques nécessaires à l'acheminement et à la sécurisation des requêtes,
+        notamment l'adresse IP, l'URL demandée, l'horodatage et des informations sur le navigateur ou le trafic. Ce traitement repose sur
+        l'intérêt légitime à fournir et sécuriser le site. Ces données sont destinées à Cloudflare et ne sont pas utilisées par {BRAND.name} à
+        des fins publicitaires ou de profilage. Leur conservation suit les durées nécessaires au service, à la sécurité et aux obligations
+        légales décrites dans la{' '}
+        <a href={LEGAL.host.privacy} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          politique de confidentialité de Cloudflare
+        </a>
+        .
+      </p>
+      <p>
+        Cloudflare est établi aux États-Unis. Des transferts de données hors de l'Espace économique européen peuvent donc intervenir. Cloudflare
+        indique les encadrer notamment par le cadre de protection des données UE–États-Unis et, si nécessaire, par les clauses contractuelles
+        types de la Commission européenne.
+      </p>
 
       {backendEnabled && (
         <>
           <h2>Avec un compte</h2>
           <ul>
-            <li><strong>Données :</strong> adresse e-mail, mot de passe (stocké chiffré par Supabase Auth), pseudo, avatar facultatif, favoris, historique de lancement, scores des jeux compatibles, succès, consentement aux recommandations.</li>
+            <li><strong>Données :</strong> adresse e-mail, identifiants gérés par Supabase Auth, pseudo, avatar facultatif, favoris, historique de lancement, scores des jeux compatibles, succès, consentement aux recommandations. {BRAND.name} n'accède jamais au mot de passe en clair.</li>
             <li><strong>Finalités :</strong> te permettre de te connecter, de retrouver tes données sur tous tes appareils et d'afficher les classements (seul ton pseudo y apparaît).</li>
             <li><strong>Base légale :</strong> exécution du service que tu demandes en créant un compte ; consentement pour les recommandations personnalisées.</li>
             <li><strong>Popularité :</strong> les classements « populaires » comptent le nombre de joueurs connectés distincts par jeu sur 30 jours, sous forme agrégée et anonyme.</li>
-            <li><strong>Sous-traitant :</strong> Supabase Inc. (hébergement de la base de données, de l'authentification et des fichiers).</li>
-            <li><strong>Durée :</strong> tant que ton compte existe. La suppression du compte depuis ton profil efface définitivement toutes ces données.</li>
+            <li><strong>Sous-traitant :</strong> Supabase (hébergement de la base de données, de l'authentification et des fichiers).</li>
+            <li><strong>Durée :</strong> pendant l'existence du compte, puis pendant les délais techniques de suppression et de sauvegarde appliqués par le prestataire.</li>
             <li><strong>Session :</strong> un jeton de connexion est conservé dans ton navigateur (localStorage) pour te garder connecté.</li>
           </ul>
         </>
@@ -106,9 +199,16 @@ export function PrivacyPage() {
 
       <h2>Tes droits</h2>
       <p>
-        Tu disposes d'un droit d'accès, de rectification, d'effacement et de portabilité. Le pseudo et l'avatar se modifient dans ton profil ;
-        la suppression du compte y est disponible directement. Pour toute autre demande : {BRAND.contactEmail ? <a href={`mailto:${BRAND.contactEmail}`}>{BRAND.contactEmail}</a> : TODO}.
-        Tu peux aussi saisir l'autorité de protection des données de ton pays (en France, la CNIL).
+        Selon ta situation, tu disposes de droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité. Les
+        données enregistrées uniquement dans ton navigateur sont directement sous ton contrôle. Pour toute autre demande, utilise le{' '}
+        <a href={LEGAL.contactUrl} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          formulaire de contact
+        </a>{' '}
+        sans publier de donnée personnelle. Tu peux également adresser une{' '}
+        <a href={LEGAL.cnilComplaint} target="_blank" rel="noopener noreferrer" className="text-accent-3 underline">
+          réclamation à la CNIL
+        </a>
+        .
       </p>
     </LegalLayout>
   );

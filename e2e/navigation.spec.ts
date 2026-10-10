@@ -29,6 +29,20 @@ test('navigates between pages from the header and footer', async ({page}) => {
   await expect(page.getByRole('heading', {name: "Cette page n'existe pas"})).toBeVisible();
 });
 
+test('legal pages identify the host and contain no unfinished placeholders', async ({page}) => {
+  await visit(page, '/mentions-legales');
+  await expect(page.getByRole('heading', {level: 1, name: 'Mentions légales'})).toBeVisible();
+  await expect(page.getByText('Cloudflare, Inc.')).toBeVisible();
+  await expect(page.getByText('101 Townsend Street')).toBeVisible();
+  await expect(page.getByText('à compléter')).toHaveCount(0);
+
+  await visit(page, '/confidentialite');
+  await expect(page.getByRole('heading', {name: 'Responsable du traitement'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Traceurs'})).toBeVisible();
+  await expect(page.getByRole('link', {name: 'réclamation à la CNIL'})).toHaveAttribute('href', 'https://www.cnil.fr/fr/plaintes');
+  await expect(page.getByText('à compléter')).toHaveCount(0);
+});
+
 test('intro plays once per session, not on navigation', async ({page}) => {
   await page.goto('/');
   const intro = page.locator('.ea-intro');
@@ -46,7 +60,7 @@ test('"Surprends-moi" opens a game page', async ({page}) => {
   await expect(page.getByRole('heading', {name: 'À propos du jeu'})).toBeVisible();
 });
 
-for (const path of ['/', '/jeux', '/jeux/system-breach', '/a-propos', '/connexion']) {
+for (const path of ['/', '/jeux', '/jeux/system-breach', '/a-propos', '/connexion', '/mentions-legales', '/confidentialite']) {
   test(`no serious accessibility violations on ${path}`, async ({page}) => {
     await visit(page, path);
     await page.waitForLoadState('networkidle');

@@ -39,7 +39,8 @@ Cible recommandée : **Cloudflare Pages** (site statique + `_headers`/`_redirect
 
 ## 3. Avant l'ouverture au public
 
-- [ ] Compléter les mentions légales (adresse et contact de l'éditeur, hébergeur, région Supabase) dans `src/features/about/LegalPages.tsx`, et `BRAND.contactEmail`.
+- [x] Mentions légales du site personnel complétées pour l'hébergement Cloudflare Pages et le fonctionnement local actuel.
+- [ ] Avant d'activer les comptes ou une base distante, compléter la politique avec l'entité Supabase contractante, la région choisie et un canal privé pour les demandes RGPD.
 - [ ] Renseigner les liens officiels (GitHub, portfolio, réseaux) dans `BRAND.links`. Les entrées vides restent masquées.
 - [ ] Lancer « Vérifier les liens » depuis l'administration.
 - [ ] Vérifier la CSP sur le domaine réel : console du navigateur, aucune ligne « Refused to ».
