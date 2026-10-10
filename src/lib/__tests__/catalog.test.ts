@@ -34,7 +34,9 @@ describe('search', () => {
 describe('filters', () => {
   it('filters by genre (AND)', () => {
     const r = queryCatalog(seedGames, {...EMPTY_QUERY, genres: ['puzzle', 'arcade']});
-    expect(r.map((g) => g.slug)).toEqual(['2048']);
+    expect(r.map((g) => g.slug)).toContain('2048');
+    expect(r.every((g) => g.genre.includes('puzzle') && g.genre.includes('arcade'))).toBe(true);
+    expect(r.map((g) => g.slug)).not.toContain('little-alchemy-2'); // puzzle but not arcade
   });
 
   it('only counts verified compatibility', () => {
