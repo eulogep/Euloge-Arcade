@@ -120,6 +120,18 @@ const MOTIFS = {
     <circle cx="26" cy="68" r="6" ${stroke(C.pink)}/><circle cx="70" cy="57" r="6" ${stroke(C.pink)}/><path d="M8 88h84" ${stroke(C.violet, 2)} opacity=".5"/>`,
   flame: (a) => `<path d="M50 92c-20 0-30-14-26-32 4-14 16-20 14-40 14 10 20 22 18 34 4-4 6-10 6-16 10 10 14 22 12 32-2 14-10 22-24 22z" ${stroke(C.amber, 3)}/>
     <path d="M50 92c-8 0-12-6-10-14 2-6 8-10 8-18 6 6 10 12 8 20 2-2 4-4 4-6 4 6 4 18-10 18z" fill="${C.pink}" opacity=".5"/>`,
+  energy: (a) => `<defs><radialGradient id="energy-core"><stop offset="0" stop-color="#fff"/><stop offset=".28" stop-color="${C.cyan}"/><stop offset="1" stop-color="${a}" stop-opacity=".08"/></radialGradient></defs>
+    <circle cx="50" cy="50" r="25" fill="url(#energy-core)"/><circle cx="50" cy="50" r="31" ${stroke(a, 2)} opacity=".7"/>
+    <circle cx="50" cy="50" r="39" ${stroke(C.violet, 1.5)} stroke-dasharray="7 6" opacity=".55"/>
+    ${Array.from({length: 12}, (_, i) => {
+      const angle = (i / 12) * Math.PI * 2;
+      const x1 = 50 + Math.cos(angle) * 35;
+      const y1 = 50 + Math.sin(angle) * 35;
+      const x2 = 50 + Math.cos(angle) * (43 + (i % 3) * 4);
+      const y2 = 50 + Math.sin(angle) * (43 + (i % 3) * 4);
+      return `<path d="M${x1} ${y1}L${x2} ${y2}" ${stroke(i % 2 ? C.cyan : a, i % 3 === 0 ? 3 : 1.7)} opacity=".8"/>`;
+    }).join('')}
+    <path d="M15 66Q30 45 42 55T68 38T88 44" ${stroke(C.pink, 2)} opacity=".75"/>`,
   sword: (a) => `<path d="M80 8l12 0 0 12-46 46-12-12z" ${stroke(a, 2.5)}/><path d="M26 52l22 22M30 70l-14 14M20 80l-8 8" ${stroke(C.amber, 4)}/>
     <circle cx="10" cy="90" r="4" fill="${C.amber}"/>`,
   ball: (a) => `<rect x="6" y="14" width="88" height="72" ${stroke(C.green, 2)} opacity=".6"/><path d="M50 14v72" ${stroke(C.green, 2)} opacity=".6"/>
@@ -206,7 +218,7 @@ const EXTERNAL = {
   wordle: ['Mots', 'Wordle', C.green, 'letters'],
   'shell-shockers': ['FPS multijoueur', 'Shell Shockers', C.amber, 'egg'],
   hextris: ['Puzzle', 'Hextris', C.violet, 'hex'],
-  'budokai-tenkaichi-3-web-online': ['Combat 3D · projet non officiel', 'Budokai Tenkaichi 3', C.amber, 'flame'],
+  'budokai-tenkaichi-3-web-online': ['Combat 3D · projet non officiel', 'Budokai Tenkaichi 3', C.cyan, 'energy'],
 };
 
 function motifArt(w, h, [kicker, title, accent, motif]) {
