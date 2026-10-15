@@ -26,6 +26,15 @@ export interface LeaderboardRow {
   achievedAt: string;
 }
 
+/** Always-available public snapshot used in local mode and as a read-only fallback. */
+function seedCatalog(): CatalogData {
+  return {
+    games: (gamesSeed as GameRow[]).filter((g) => g.status === 'published').map(rowToGame),
+    embedDomains: embedSeed.map((d) => d.domain),
+    achievements: achievementsSeed.map(({id, title, description, icon, sort}) => ({id, title, description, icon, sort})),
+  };
+}
+
 /**
  * Public, read-only REST call. Avoids waiting for supabase-js (lazy-loaded for
  * auth) on the critical rendering path. Uses only the public anon key; RLS applies.
@@ -50,23 +59,26 @@ async function publicRest<T>(path: string, init: RequestInit = {}): Promise<T> {
  */
 export async function loadCatalog(): Promise<CatalogData> {
   if (!ENV.backendEnabled) {
-    return {
-      games: (gamesSeed as GameRow[]).filter((g) => g.status === 'published').map(rowToGame),
-      embedDomains: embedSeed.map((d) => d.domain),
-      achievements: achievementsSeed.map(({id, title, description, icon, sort}) => ({id, title, description, icon, sort})),
-    };
+    return seedCatalog();
   }
-  const cols = GAME_COLUMNS.replace(/\s+/g, '');
-  const [games, domains, achievements] = await Promise.all([
-    publicRest<GameRow[]>(`games?select=${cols}&status=eq.published`),
-    publicRest<Array<{domain: string}>>('embed_domains?select=domain'),
-    publicRest<AchievementDef[]>('achievements?select=id,title,description,icon,sort&order=sort'),
-  ]);
-  return {
-    games: games.map(rowToGame),
-    embedDomains: domains.map((d) => d.domain),
-    achievements,
-  };
+  try {
+    const cols = GAME_COLUMNS.replace(/\s+/g, '');
+    const [games, domains, achievements] = await Promise.all([
+      publicRest<GameRow[]>(`games?select=${cols}&status=eq.published`),
+      publicRest<Array<{domain: string}>>('embed_domains?select=domain'),
+      publicRest<AchievementDef[]>('achievements?select=id,title,description,icon,sort&order=sort'),
+    ]);
+    return {
+      games: games.map(rowToGame),
+      embedDomains: domains.map((d) => d.domain),
+      achievements,
+    };
+  } catch (error) {
+    // Discovery must remain usable during a backend outage. Accounts, admin,
+    // popularity and score features still report their own unavailable state.
+    console.warn('[catalog] backend unavailable; using bundled public snapshot', error);
+    return seedCatalog();
+  }
 }
 
 /** Distinct players per game over the last 30 days. Null when no real data source exists. */
