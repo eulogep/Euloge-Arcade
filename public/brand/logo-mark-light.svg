@@ -1,14 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Euloge Arcade">
-  <defs>
-    <linearGradient id="ea-gl" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0891B2"/>
-      <stop offset=".5" stop-color="#1D4ED8"/>
-      <stop offset="1" stop-color="#7E22CE"/>
-    </linearGradient>
-  </defs>
-  <path d="M15 3.5H60.5V49L49 60.5H3.5V15Z" fill="#FFFFFF" stroke="url(#ea-gl)" stroke-width="2.5" stroke-linejoin="round"/>
-  <g fill="url(#ea-gl)">
-    <path d="M17 14H47L43 20.5H24V43.5H43L47 50H17Z"/>
-    <path d="M28 28.75H43.5L40 35.25H28Z"/>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Euloge Arcade" role="img" viewBox="0 0 64 64"><defs><linearGradient id="ea-gl" x1="6" x2="58" y1="6" y2="58" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0891B2"/><stop offset=".5" stop-color="#1D4ED8"/><stop offset="1" stop-color="#7E22CE"/></linearGradient></defs><path fill="#FFF" stroke="url(#ea-gl)" stroke-linejoin="round" stroke-width="2.5" d="M15 3.5H60.5V49L49 60.5H3.5V15Z"/><g fill="url(#ea-gl)"><path d="M17 14H47L43 20.5H24V43.5H43L47 50H17Z"/><path d="M28 28.75H43.5L40 35.25H28Z"/></g></svg>
