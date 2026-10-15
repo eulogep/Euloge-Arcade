@@ -53,6 +53,18 @@ test('Mode C — external game is never framed and opens the official site safel
   await expect(page.getByText(/n'autorise pas son intégration/)).toBeVisible();
 });
 
+test('Budokai Tenkaichi 3 stays external and exposes verified controls', async ({page}) => {
+  await visit(page, '/jeux/budokai-tenkaichi-3-web-online');
+  await expect(page.getByRole('heading', {level: 1, name: 'Budokai Tenkaichi 3 Web Online'})).toBeVisible();
+  await expect(page.locator('iframe')).toHaveCount(0);
+  const link = page.locator('a[href="https://dragonballbt3.online/"]').first();
+  await expect(link).toHaveAttribute('href', 'https://dragonballbt3.online/');
+  await expect(link).toHaveAttribute('target', '_blank');
+  await expect(page.getByText('WASD / flèches')).toBeVisible();
+  await expect(page.getByText('Manette USB ou Bluetooth')).toBeVisible();
+  await expect(page.getByText('Stick et boutons virtuels')).toBeVisible();
+});
+
 test('a game flagged as dead link is shown as unavailable', async ({page}) => {
   // Simulate the admin link checker having flagged the game.
   await page.route('**/rest/v1/games?*', async (route) => {

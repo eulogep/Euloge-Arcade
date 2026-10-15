@@ -1505,5 +1505,71 @@
     "link_checked_at": "2026-10-10T00:00:00Z",
     "created_at": "2026-10-10T00:00:00Z",
     "updated_at": "2026-10-10T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000039",
+    "slug": "budokai-tenkaichi-3-web-online",
+    "title": "Budokai Tenkaichi 3 Web Online",
+    "tagline": "Des combats 3D jouables dans le navigateur, en solo ou en ligne.",
+    "description": "Projet web indépendant et non officiel autour de Budokai Tenkaichi 3. Il propose le jeu local, des salles privées expérimentales à deux joueurs, un classement et une sauvegarde locale dans le navigateur.",
+    "instructions": "Le jeu s'ouvre sur son site d'origine dans un nouvel onglet. Clique dans l'image du jeu pour lui donner le focus. Utilise WASD ou les flèches pour te déplacer, Z/X/A/S pour les actions, Entrée pour Start et Maj droite pour Select.",
+    "genre": [
+      "action",
+      "arcade",
+      "retro"
+    ],
+    "cover_url": "/covers/budokai-tenkaichi-3-web-online.jpg",
+    "banner_url": "/covers/budokai-tenkaichi-3-web-online-banner.jpg",
+    "launch_mode": "external",
+    "launch_url": "https://dragonballbt3.online/",
+    "source_url": "https://dragonballbt3.online/",
+    "developer": "Slayoner — projet indépendant non officiel",
+    "license_status": "link_only",
+    "license_notes": "Lien vers le site d'origine uniquement : aucun fichier, logo ou visuel du jeu n'est hébergé par Euloge Arcade. Le site se présente comme un projet indépendant non officiel et déclare disposer d'une autorisation/licence pour son propre usage ; cette déclaration ne transfère aucun droit à Euloge Arcade. Le serveur interdit l'intégration tierce (X-Frame-Options: SAMEORIGIN). Vérifié le 2026-10-15.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": false,
+      "gamepad": true,
+      "touch": true,
+      "verified": true
+    },
+    "controls": [
+      {
+        "device": "keyboard",
+        "input": "WASD / flèches",
+        "action": "Déplacement"
+      },
+      {
+        "device": "keyboard",
+        "input": "Z / X / A / S",
+        "action": "Actions de combat"
+      },
+      {
+        "device": "keyboard",
+        "input": "Entrée / Maj droite",
+        "action": "Start / Select"
+      },
+      {
+        "device": "gamepad",
+        "input": "Manette USB ou Bluetooth",
+        "action": "Commandes complètes"
+      },
+      {
+        "device": "touch",
+        "input": "Stick et boutons virtuels",
+        "action": "Commandes mobiles"
+      }
+    ],
+    "orientation": "landscape",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-10-15T00:00:00Z",
+    "link_status": "ok",
+    "link_checked_at": "2026-10-15T00:00:00Z",
+    "link_check_detail": "HTTPS 200. Ouverture externe obligatoire : X-Frame-Options SAMEORIGIN.",
+    "created_at": "2026-10-15T00:00:00Z",
+    "updated_at": "2026-10-15T00:00:00Z"
   }
 ]

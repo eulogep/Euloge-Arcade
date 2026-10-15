@@ -26,6 +26,15 @@ describe('decideLaunch', () => {
     expect(decideLaunch(bySlug('lichess-daily-puzzle'), []).kind).toBe('external');
   });
 
+  it('opens Budokai Tenkaichi 3 on its original site because framing is forbidden', () => {
+    const game = bySlug('budokai-tenkaichi-3-web-online');
+    expect(game.launchUrl).toBe('https://dragonballbt3.online/');
+    expect(decideLaunch(game, ['dragonballbt3.online'])).toEqual({
+      kind: 'external',
+      href: 'https://dragonballbt3.online/',
+    });
+  });
+
   it('falls back to external when the provider now refuses framing', () => {
     expect(decideLaunch({...bySlug('lichess-daily-puzzle'), linkStatus: 'embed_blocked'}, allow).kind).toBe('external');
   });

@@ -206,6 +206,7 @@ const EXTERNAL = {
   wordle: ['Mots', 'Wordle', C.green, 'letters'],
   'shell-shockers': ['FPS multijoueur', 'Shell Shockers', C.amber, 'egg'],
   hextris: ['Puzzle', 'Hextris', C.violet, 'hex'],
+  'budokai-tenkaichi-3-web-online': ['Combat 3D · projet non officiel', 'Budokai Tenkaichi 3', C.amber, 'flame'],
 };
 
 function motifArt(w, h, [kicker, title, accent, motif]) {
