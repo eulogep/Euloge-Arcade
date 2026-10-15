@@ -32,7 +32,9 @@ jobs:
           cache: npm
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pin the locally validated CLI: avoids GitHub API rate limits when
+          # setup-cli tries to resolve the moving "latest" release.
+          version: 2.116.0
       - run: npm ci
       - run: supabase start -x realtime,studio,imgproxy,vector,logflare,supavisor
       - run: supabase test db
