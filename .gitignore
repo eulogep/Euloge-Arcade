@@ -11,3 +11,8 @@ test-results/
 supabase/.temp/
 supabase/.branches/
 supabase/functions/.env.local
+
+# Ported2Browser importer: raw snapshots, run reports and link-check cache are local
+imports/ported2browser/raw/
+imports/ported2browser/reports/
+imports/ported2browser/link-cache.json

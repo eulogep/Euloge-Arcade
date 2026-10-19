@@ -1,0 +1,75 @@
+[
+  {
+    "id": "p2b-001",
+    "title": "Exemple Quest",
+    "description": "Un jeu d'aventure fictif utilisé pour tester l'importateur Ported2Browser.",
+    "genres": ["Platformer", "Retro"],
+    "original_platform": "DOS",
+    "year": 1994,
+    "original_developer": "Studio Exemple",
+    "port_author": "Porteur Exemple",
+    "page_url": "https://ported2browser.example/games/exemple-quest",
+    "play_url": "https://play.example.com/exemple-quest/",
+    "cover_url": "https://ported2browser.example/covers/exemple-quest.jpg",
+    "controls": {"keyboard": true, "mouse": false, "touch": false, "gamepad": true},
+    "embeddable": true,
+    "license_notes": "Moteur libre, données du jeu original requises."
+  },
+  {
+    "id": "p2b-002",
+    "title": "Racer Exemple",
+    "description": "",
+    "genres": "Racing, Simulation",
+    "original_platform": "PlayStation",
+    "year": "1999",
+    "page_url": "https://ported2browser.example/games/racer-exemple",
+    "play_url": "https://racer.example.org/play",
+    "controls": {"keyboard": true}
+  },
+  {
+    "id": "p2b-003",
+    "title": "RPG Exemple",
+    "description": "Un jeu de rôle fictif dont le genre n'existe pas encore dans le catalogue.",
+    "genres": ["RPG"],
+    "page_url": "https://ported2browser.example/games/rpg-exemple",
+    "play_url": "https://rpg.example.net/"
+  },
+  {
+    "id": "p2b-004",
+    "title": "Lien Raccourci",
+    "description": "Fiche dont le lien passe par un raccourcisseur : refusée.",
+    "genres": ["Action"],
+    "play_url": "https://bit.ly/abc123"
+  },
+  {
+    "id": "p2b-005",
+    "title": "Pas Sécurisé",
+    "description": "Fiche dont le lien n'est pas en https : refusée.",
+    "genres": ["Action"],
+    "play_url": "http://insecure.example.com/"
+  },
+  {
+    "id": "p2b-001",
+    "title": "Exemple Quest (doublon d'identifiant)",
+    "description": "Même identifiant que la première fiche.",
+    "genres": ["Platformer"],
+    "play_url": "https://other.example.com/"
+  },
+  {
+    "id": "p2b-006",
+    "title": "Exemple Quest Miroir",
+    "description": "Même URL de lancement que la première fiche, à une barre oblique près.",
+    "genres": ["Platformer"],
+    "play_url": "https://www.play.example.com/exemple-quest"
+  },
+  {
+    "id": "p2b-007",
+    "title": "Fiche Sans Lien De Jeu",
+    "description": "Seule l'URL de la fiche est connue.",
+    "genres": ["Puzzle"],
+    "page_url": "https://ported2browser.example/games/fiche-sans-lien"
+  },
+  {
+    "description": "Fiche sans titre ni identifiant ni URL."
+  }
+]
