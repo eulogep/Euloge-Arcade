@@ -237,6 +237,27 @@ function motifArt(w, h, [kicker, title, accent, motif]) {
 
 for (const [slug, spec] of Object.entries(EXTERNAL)) covers[slug] = (w, h) => motifArt(w, h, spec);
 
+// Any other catalog game without a cover (e.g. imported by scripts/import-ported2browser.ts) gets a
+// generic original cover picked from its first genre. Source artwork is never reused.
+const GENRE_ART = {
+  fps: ['FPS', C.pink, 'crosshair'],
+  action: ['Action', C.pink, 'claws'],
+  platformer: ['Plateformes', C.violet, 'mountain'],
+  arcade: ['Arcade', C.cyan, 'snake'],
+  puzzle: ['Réflexion', C.cyan, 'blocks'],
+  strategy: ['Stratégie', C.amber, 'castle'],
+  board: ['Plateau', C.violet, 'elements'],
+  retro: ['Rétro', C.amber, 'rings'],
+  racing: ['Course', C.cyan, 'wave'],
+  sports: ['Sport', C.green, 'ball'],
+};
+const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+for (const g of JSON.parse(readFileSync(resolve(root, 'src/data/games.seed.json'), 'utf8'))) {
+  if (g.cover_url || covers[g.slug]) continue;
+  const [label, accent, motif] = GENRE_ART[g.genre[0]] ?? GENRE_ART.retro;
+  covers[g.slug] = (w, h) => motifArt(w, h, [`${label} · portage navigateur`, escapeHtml(g.title), accent, motif]);
+}
+
 function chessArt(w, h, label, piece, accent, banner) {
   const n = 8;
   const size = h * 1.1;
