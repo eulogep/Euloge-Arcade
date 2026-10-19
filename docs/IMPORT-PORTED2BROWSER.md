@@ -1,6 +1,6 @@
 # Import du catalogue Ported2Browser
 
-Ported2Browser bloque les accès automatisés (Cloudflare). L'import repose donc sur un **export fourni par le responsable du site**, jamais sur l'extraction de ses pages.
+Ported2Browser bloque les accès automatisés (Cloudflare). L'import détaillé repose donc sur un **export fourni par le responsable du site**. Avec son autorisation, des pages du catalogue enregistrées manuellement dans le navigateur peuvent aussi servir à vérifier l'inventaire public, sans contourner cette protection.
 
 ```text
 export JSON → lecture → copie brute (raw/) → normalisation → validation (schéma du catalogue)
@@ -9,6 +9,21 @@ export JSON → lecture → copie brute (raw/) → normalisation → validation 
 ```
 
 ## Utilisation
+
+### Découverte locale depuis des pages enregistrées
+
+La commande suivante lit uniquement les fichiers HTML indiqués. Par défaut, elle affiche le bilan sans écrire de fichier et sans effectuer de requête réseau :
+
+```bash
+npm run discover:p2b -- --input page-1.html --input page-2.html
+
+# Sortie JSON locale facultative
+npm run discover:p2b -- --input dossier-des-pages/ --output inventaire.json
+```
+
+Cette étape extrait seulement les informations visibles sur les cartes : identifiant source, titre, auteur du port, URL de fiche, référence de couverture, tags et alertes. Elle n'invente ni description, ni genre, ni commandes, ni URL de lancement. Un inventaire n'est déclaré complet que si le nombre d'identifiants uniques correspond au total annoncé par le site.
+
+### Import depuis l'export JSON détaillé
 
 ```bash
 # 1. Simulation : rapport uniquement, le catalogue n'est pas modifié

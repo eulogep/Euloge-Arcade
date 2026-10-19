@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "seed:sql": "node scripts/generate-seed.mjs",
     "brand:assets": "node scripts/render-brand-assets.mjs",
+    "discover:p2b": "vite-node scripts/discover-ported2browser-html.ts --",
     "import:p2b": "vite-node scripts/import-ported2browser.ts --"
   },
   "dependencies": {
