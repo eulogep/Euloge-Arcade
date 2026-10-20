@@ -2,6 +2,7 @@ import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useS
 import {ENV} from '@/config/env';
 import {newlyEarned, type RunRecord} from '@/features/achievements/evaluate';
 import {readJson, STORAGE_KEYS, writeJson} from '@/lib/storage';
+import {applySeasonalTheme} from '@/lib/season';
 import * as auth from '@/services/authService';
 import type {Profile} from '@/services/authService';
 import {loadCatalog, loadPopularity, type CatalogData} from '@/services/catalogService';
@@ -86,6 +87,7 @@ export function usePlatform(): PlatformContextValue {
 function applySettingsToDocument(settings: Settings) {
   const root = document.documentElement;
   root.dataset.theme = settings.theme;
+  applySeasonalTheme(root);
   if (settings.reducedMotion) root.dataset.motion = 'reduced';
   else delete root.dataset.motion;
 }

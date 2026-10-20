@@ -1,4 +1,4 @@
-import {Dices, Heart, Home, LayoutGrid, LogIn, LogOut, Search, Shield, User} from 'lucide-react';
+import {Dices, Ghost, Heart, Home, LayoutGrid, LogIn, LogOut, Search, Shield, User} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {usePlatform} from '@/app/PlatformProvider';
@@ -187,6 +187,9 @@ export function Header() {
           <Logo className="hidden sm:inline-flex" />
           <Logo compact className="sm:hidden" />
         </Link>
+        <span className="halloween-badge hidden xl:inline-flex">
+          <Ghost size={14} aria-hidden /> Halloween
+        </span>
         <nav aria-label="Navigation principale" className="hidden items-center gap-1 md:flex">
           {NAV.map(({to, label, end}) => (
             <NavLink

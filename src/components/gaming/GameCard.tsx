@@ -49,7 +49,7 @@ export function GameCard({game, className, eager = false}: {game: Game; classNam
       style={{['--rx' as string]: '0deg', ['--ry' as string]: '0deg'}}>
       <div
         className={cn(
-          'relative overflow-hidden rounded-2xl border bg-surface shadow-card transition-[transform,box-shadow] duration-300 ease-out border-line-soft',
+          'game-card-shell relative overflow-hidden rounded-2xl border bg-surface shadow-card transition-[transform,box-shadow] duration-300 ease-out border-line-soft',
           '[transform:rotateX(var(--rx))_rotateY(var(--ry))] [transform-style:preserve-3d]',
           'group-hover:-translate-y-1 group-hover:shadow-glow group-focus-within:shadow-glow',
         )}>

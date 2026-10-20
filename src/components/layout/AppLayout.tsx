@@ -2,6 +2,7 @@ import {Suspense, useEffect} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 import {Footer} from '@/components/layout/Footer';
 import {Header, MobileTabBar} from '@/components/layout/Header';
+import {HalloweenAtmosphere} from '@/components/layout/HalloweenAtmosphere';
 import {IntroSplash} from '@/components/layout/IntroSplash';
 import {BrandLoader, Toaster} from '@/components/ui/feedback';
 import {cn} from '@/lib/cn';
@@ -22,6 +23,7 @@ export function AppLayout() {
   return (
     <>
       <IntroSplash />
+      <HalloweenAtmosphere />
       <ScrollToTop />
       <Header />
       <main id="contenu" className={cn('min-h-[100dvh] pb-20 md:pb-0', underHeader && '-mt-16')}>

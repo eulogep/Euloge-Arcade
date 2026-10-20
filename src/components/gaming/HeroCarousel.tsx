@@ -43,7 +43,7 @@ export function HeroCarousel({games}: {games: Game[]}) {
     <section
       aria-roledescription="carrousel"
       aria-label="Jeux à la une"
-      className="relative isolate overflow-hidden"
+      className="hero-carousel relative isolate overflow-hidden"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setHovered(true)}
