@@ -1,14 +1,17 @@
 import {Clock, Crosshair, Dices, Flame, Joystick, LayoutGrid, Sparkles, Star, Wand2} from 'lucide-react';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {usePlatform} from '@/app/PlatformProvider';
 import {GameGrid, GameRail} from '@/components/gaming/GameRail';
 import {HeroCarousel} from '@/components/gaming/HeroCarousel';
+import {TacticalDeck} from '@/components/gaming/TacticalDeck';
 import {useSurprise} from '@/components/layout/Header';
 import {ErrorState, Skeleton} from '@/components/ui/feedback';
 import {useDocumentTitle} from '@/hooks/useDocumentTitle';
 import {featuredGames, sortGames} from '@/lib/catalog';
 import {recommendGames} from '@/lib/recommend';
+import {playClickPulse} from '@/lib/sound';
+import {cn} from '@/lib/cn';
 import type {Game} from '@/types/game';
 
 const NEW_WINDOW_DAYS = 60;
@@ -28,9 +31,20 @@ function HomeSkeleton() {
 
 export default function HomePage() {
   useDocumentTitle();
-  const {catalog, games, gameById, history, favorites, popularity, recommendationsConsent, setRecommendationsConsent, reloadCatalog, user} =
-    usePlatform();
+  const {
+    catalog,
+    games,
+    gameById,
+    history,
+    favorites,
+    popularity,
+    recommendationsConsent,
+    setRecommendationsConsent,
+    reloadCatalog,
+    user,
+  } = usePlatform();
   const surprise = useSurprise();
+  const [viewMode, setViewMode] = useState<'grid' | 'deck'>('grid');
 
   const sections = useMemo(() => {
     const continuePlaying: Game[] = [];
@@ -87,6 +101,9 @@ export default function HomePage() {
     <div className="space-y-14">
       <HeroCarousel games={sections.featured.length ? sections.featured : sections.all.slice(0, 3)} />
 
+      {/* Console Telemetry Bar + Daily Protocol + Mood Roulette */}
+      <TacticalDeck />
+
       <GameRail
         title={user ? 'Reprendre où tu en étais' : 'Continuer à jouer'}
         subtitle="Tes derniers lancements"
@@ -113,7 +130,7 @@ export default function HomePage() {
       ) : (
         hasActivity && (
           <section className="container-page">
-            <div className="glass flex flex-col items-start gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="holo-panel reticle-frame flex flex-col items-start gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="flex items-center gap-2 font-display text-lg font-bold">
                   <Wand2 size={18} className="text-accent-2" /> Des recommandations personnalisées ?
@@ -137,10 +154,43 @@ export default function HomePage() {
 
       <section className="container-page" aria-labelledby="all-games">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-          <h2 id="all-games" className="section-title flex items-center gap-2">
-            <LayoutGrid size={20} className="text-accent-3" /> Tous les jeux
-          </h2>
-          <div className="flex gap-2">
+          <div>
+            <h2 id="all-games" className="section-title flex items-center gap-2">
+              <LayoutGrid size={20} className="text-accent-3" /> Tous les jeux
+            </h2>
+            <p className="mt-1 text-sm text-ink-muted">
+              L'intégralité du catalogue ({sections.all.length} cartouches vérifiées)
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="hidden rounded-xl border bg-surface/70 p-1 sm:flex border-line-soft" role="group" aria-label="Mode d'affichage">
+              <button
+                type="button"
+                onClick={() => {
+                  playClickPulse();
+                  setViewMode('grid');
+                }}
+                aria-pressed={viewMode === 'grid'}
+                className={cn(
+                  'rounded-lg px-2.5 py-1 text-xs font-semibold transition',
+                  viewMode === 'grid' ? 'bg-accent/20 text-ink' : 'text-ink-muted hover:text-ink',
+                )}>
+                Cartes 3D
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playClickPulse();
+                  setViewMode('deck');
+                }}
+                aria-pressed={viewMode === 'deck'}
+                className={cn(
+                  'rounded-lg px-2.5 py-1 text-xs font-semibold transition',
+                  viewMode === 'deck' ? 'bg-accent/20 text-ink' : 'text-ink-muted hover:text-ink',
+                )}>
+                Deck Liste
+              </button>
+            </div>
             <button type="button" onClick={surprise} className="btn-secondary">
               <Dices size={16} /> Surprends-moi
             </button>
@@ -149,7 +199,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        <GameGrid games={sections.all} />
+        <GameGrid games={sections.all} viewMode={viewMode} />
       </section>
     </div>
   );

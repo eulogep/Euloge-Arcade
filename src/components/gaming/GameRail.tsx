@@ -1,10 +1,20 @@
-import {ChevronLeft, ChevronRight} from 'lucide-react';
+import {ChevronLeft, ChevronRight, Cpu, Play} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
+import {
+  AvailabilityBadge,
+  CompatibilityIcons,
+  CoverImage,
+  FavoriteButton,
+  GenreBadges,
+} from '@/components/gaming/GameBits';
 import {GameCard} from '@/components/gaming/GameCard';
+import {QuickInspectButton} from '@/components/gaming/GameQuickViewModal';
+import {getCartridgeCode} from '@/lib/prestige';
+import {playClickPulse} from '@/lib/sound';
 import type {Game} from '@/types/game';
 
-/** Horizontally scrollable shelf of game cards with snap + arrow controls. */
+/** Horizontally scrollable Holo-Shelf of game cartridges with snap + arrow controls. */
 export function GameRail({
   title,
   subtitle,
@@ -39,6 +49,7 @@ export function GameRail({
   if (games.length === 0) return null;
 
   const scrollBy = (dir: 1 | -1) => {
+    playClickPulse();
     const el = scroller.current;
     if (el) el.scrollBy({left: dir * el.clientWidth * 0.85, behavior: 'smooth'});
   };
@@ -48,16 +59,19 @@ export function GameRail({
     <section aria-labelledby={headingId} className="container-page">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <h2 id={headingId} className="section-title flex items-center gap-2">
-            {icon && <span className="text-accent-3">{icon}</span>}
-            {title}
-          </h2>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h2 id={headingId} className="section-title flex items-center gap-2">
+              {icon && <span className="text-accent-3">{icon}</span>}
+              {title}
+            </h2>
+            <span className="hud-tag">{games.length}</span>
+          </div>
           {subtitle && <p className="mt-1 text-sm text-ink-muted">{subtitle}</p>}
         </div>
         <div className="flex items-center gap-2">
           {seeAllHref && (
             <Link to={seeAllHref} className="btn-ghost h-9 min-h-0 px-3 text-xs">
-              Tout voir
+              Tout voir →
             </Link>
           )}
           <button
@@ -90,7 +104,53 @@ export function GameRail({
   );
 }
 
-export function GameGrid({games}: {games: Game[]}) {
+export function GameGrid({games, viewMode = 'grid'}: {games: Game[]; viewMode?: 'grid' | 'deck'}) {
+  if (viewMode === 'deck') {
+    return (
+      <div className="space-y-3">
+        {games.map((g, i) => {
+          const detailsHref = `/jeux/${g.slug}`;
+          return (
+            <article
+              key={g.id}
+              className="holo-panel group flex flex-col justify-between gap-4 rounded-2xl p-3 sm:flex-row sm:items-center sm:p-4 animate-fade-up">
+              <div className="flex min-w-0 flex-1 items-center gap-4">
+                <Link to={detailsHref} className="relative block h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-line-soft">
+                  <CoverImage game={g} eager={i < 4} className="h-full w-full" />
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span className="hud-tag">
+                      <Cpu size={11} className="text-accent-3" /> {getCartridgeCode(g)}
+                    </span>
+                    <AvailabilityBadge game={g} />
+                    <GenreBadges game={g} max={3} />
+                  </div>
+                  <h3 className="truncate font-display text-lg font-bold">
+                    <Link to={detailsHref} className="hover:text-accent-3 transition-colors">
+                      {g.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-0.5 line-clamp-1 text-sm text-ink-muted">{g.tagline}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:shrink-0">
+                <div className="mr-1 hidden xl:block">
+                  <CompatibilityIcons game={g} />
+                </div>
+                <Link to={`${detailsHref}?jouer=1`} className="btn-primary h-10 min-h-0 px-4 text-xs">
+                  <Play size={14} className="fill-current" /> Jouer
+                </Link>
+                <QuickInspectButton game={g} className="btn-secondary h-10 min-h-0 w-10 px-0" />
+                <FavoriteButton game={g} />
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {games.map((g, i) => (

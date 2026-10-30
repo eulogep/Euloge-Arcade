@@ -1,4 +1,4 @@
-import {ArrowLeft, BookOpen, ExternalLink, Gamepad2, Info, Medal, Scale, Trophy} from 'lucide-react';
+import {ArrowLeft, BookOpen, Clock, Cpu, ExternalLink, Gamepad2, Info, Medal, Scale, Trophy} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {Link, useParams, useSearchParams} from 'react-router-dom';
 import {usePlatform} from '@/app/PlatformProvider';
@@ -15,6 +15,7 @@ import {ControlsList} from '@/features/game/ControlsList';
 import {GamePlayer} from '@/features/player/GamePlayer';
 import {useDocumentTitle} from '@/hooks/useDocumentTitle';
 import {LAUNCH_MODE_LABELS, similarGames} from '@/lib/catalog';
+import {getCartridgeCode} from '@/lib/prestige';
 import {loadLeaderboard, type LeaderboardRow} from '@/services/catalogService';
 import type {Game, LicenseStatus} from '@/types/game';
 
@@ -40,18 +41,18 @@ function Scores({game}: {game: Game}) {
   const [boardError, setBoardError] = useState(false);
 
   useEffect(() => {
-    if (!backendEnabled) return;
+    if (!backendEnabled || !game.supportsScores) return;
     loadLeaderboard(game.id)
       .then(setBoard)
       .catch(() => setBoardError(true));
-  }, [game.id, backendEnabled, runs.length]);
+  }, [game.id, game.supportsScores, backendEnabled, runs.length]);
 
   return (
-    <section className="glass rounded-2xl p-5" aria-labelledby="scores-title">
+    <section className="holo-panel reticle-frame rounded-2xl p-5" aria-labelledby="scores-title">
       <h2 id="scores-title" className="mb-4 flex items-center gap-2 font-display text-lg font-bold">
         <Trophy size={18} className="text-warning" /> Scores
       </h2>
-      <div className="mb-4 rounded-xl bg-surface-2/60 p-4">
+      <div className="mb-4 rounded-xl bg-surface-2/60 p-4 border border-line-soft">
         <p className="text-xs font-semibold uppercase tracking-wider text-ink-faint">Ton record</p>
         {best ? (
           <p className="mt-1 font-display text-2xl font-black">
@@ -69,7 +70,7 @@ function Scores({game}: {game: Game}) {
           </p>
         )}
       </div>
-      {backendEnabled && (
+      {backendEnabled && game.supportsScores && (
         <>
           <h3 className="mb-2 flex items-center gap-2 text-sm font-bold">
             <Medal size={16} className="text-accent-3" /> Classement
@@ -103,11 +104,16 @@ function Scores({game}: {game: Game}) {
 export default function GameDetailsPage() {
   const {slug} = useParams();
   const [params] = useSearchParams();
-  const {catalog, games, reloadCatalog} = usePlatform();
+  const {catalog, games, history, reloadCatalog} = usePlatform();
   const game = useMemo(() => games.find((g) => g.slug === slug), [games, slug]);
   useDocumentTitle(game?.title ?? 'Jeu');
   const similar = useMemo(() => (game ? similarGames(game, games) : []), [game, games]);
   const autoStart = params.get('jouer') === '1';
+
+  const myLaunches = useMemo(
+    () => (game ? history.filter((h) => h.gameId === game.id) : []),
+    [history, game],
+  );
 
   if (catalog.status === 'loading') {
     return (
@@ -141,13 +147,14 @@ export default function GameDetailsPage() {
   }
 
   const isThirdParty = game.licenseStatus !== 'owned';
+  const cartridgeCode = getCartridgeCode(game);
 
   return (
     <div>
       {/* Banner */}
       <div className="relative h-[260px] overflow-hidden sm:h-[340px]">
         <CoverImage game={game} src={game.bannerUrl ?? game.coverUrl} eager className="h-full w-full" />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/75 to-bg/20" />
       </div>
 
       <div className="container-page relative -mt-40 sm:-mt-44">
@@ -157,8 +164,16 @@ export default function GameDetailsPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="animate-fade-up">
             <div className="mb-3 flex flex-wrap items-center gap-2">
+              <span className="hud-tag text-accent-3">
+                <Cpu size={11} /> {cartridgeCode}
+              </span>
               <AvailabilityBadge game={game} />
               <GenreBadges game={game} max={5} />
+              {myLaunches.length > 0 && (
+                <span className="hud-tag">
+                  <Clock size={11} className="text-success" /> {myLaunches.length} SESSION{myLaunches.length > 1 ? 'S' : ''}
+                </span>
+              )}
             </div>
             <h1 className="font-display text-4xl font-black sm:text-5xl">{game.title}</h1>
             <p className="mt-2 max-w-2xl text-ink-muted">{game.tagline}</p>
@@ -175,14 +190,14 @@ export default function GameDetailsPage() {
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-8">
-            <section aria-labelledby="about-game">
+            <section aria-labelledby="about-game" className="holo-panel rounded-2xl p-6">
               <h2 id="about-game" className="section-title mb-3 flex items-center gap-2">
                 <Info size={20} className="text-accent-3" /> À propos du jeu
               </h2>
               <p className="whitespace-pre-line leading-relaxed text-ink-muted">{game.description}</p>
             </section>
             {game.instructions && (
-              <section aria-labelledby="how-to">
+              <section aria-labelledby="how-to" className="holo-panel rounded-2xl p-6">
                 <h2 id="how-to" className="section-title mb-3 flex items-center gap-2">
                   <BookOpen size={20} className="text-accent-3" /> Comment jouer
                 </h2>
@@ -190,7 +205,7 @@ export default function GameDetailsPage() {
               </section>
             )}
             {game.controls.length > 0 && (
-              <section aria-labelledby="controls" className="glass rounded-2xl p-5">
+              <section aria-labelledby="controls" className="holo-panel reticle-frame rounded-2xl p-5 sm:p-6">
                 <h2 id="controls" className="mb-4 font-display text-lg font-bold">
                   Commandes
                 </h2>
@@ -203,12 +218,16 @@ export default function GameDetailsPage() {
           </div>
 
           <aside className="space-y-6">
-            {game.supportsScores && <Scores game={game} />}
-            <section className="glass rounded-2xl p-5" aria-labelledby="credits-title">
+            <Scores game={game} />
+            <section className="holo-panel reticle-frame rounded-2xl p-5" aria-labelledby="credits-title">
               <h2 id="credits-title" className="mb-4 flex items-center gap-2 font-display text-lg font-bold">
                 <Scale size={18} className="text-accent-2" /> Informations &amp; droits
               </h2>
               <dl className="space-y-3 text-sm">
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-ink-faint">Code Cartouche</dt>
+                  <dd className="font-mono text-xs text-accent-3">{cartridgeCode}</dd>
+                </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wider text-ink-faint">Développeur / éditeur</dt>
                   <dd>{game.developer ?? 'Voir le site officiel'}</dd>

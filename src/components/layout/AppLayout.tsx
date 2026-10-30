@@ -1,5 +1,8 @@
 import {Suspense, useEffect} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
+import {GameQuickViewModal} from '@/components/gaming/GameQuickViewModal';
+import {ReflexLabModal} from '@/components/gaming/ReflexLabModal';
+import {CommandPalette} from '@/components/layout/CommandPalette';
 import {Footer} from '@/components/layout/Footer';
 import {Header, MobileTabBar} from '@/components/layout/Header';
 import {HalloweenAtmosphere} from '@/components/layout/HalloweenAtmosphere';
@@ -36,6 +39,9 @@ export function AppLayout() {
       </main>
       <Footer />
       <MobileTabBar />
+      <GameQuickViewModal />
+      <CommandPalette />
+      <ReflexLabModal />
       <Toaster />
     </>
   );

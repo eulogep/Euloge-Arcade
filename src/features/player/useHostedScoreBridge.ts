@@ -30,7 +30,7 @@ export function useHostedScoreBridge(game: Game, iframeRef: RefObject<HTMLIFrame
   const {submitRun, notify} = usePlatform();
 
   useEffect(() => {
-    if (!enabled || !game.supportsScores) return;
+    if (!enabled) return;
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       if (!iframeRef.current || event.source !== iframeRef.current.contentWindow) return;

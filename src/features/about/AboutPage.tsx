@@ -1,9 +1,11 @@
-import {Gauge, Gamepad2, Heart, ShieldCheck} from 'lucide-react';
+import {Cpu, Crosshair, Gauge, Gamepad2, Heart, Layers, ShieldCheck} from 'lucide-react';
 import {Link} from 'react-router-dom';
+import {usePlatform} from '@/app/PlatformProvider';
 import {BRAND} from '@/config/brand';
 import {hasSocialLinks, SocialLinks} from '@/components/layout/SocialLinks';
 import {LogoMark} from '@/components/ui/Logo';
 import {useDocumentTitle} from '@/hooks/useDocumentTitle';
+import {playClickPulse} from '@/lib/sound';
 
 const PILLARS = [
   {Icon: Gauge, title: 'Instantané', text: 'Du catalogue au jeu en un clic, sans installation ni téléchargement inutile.'},
@@ -14,17 +16,22 @@ const PILLARS = [
 
 export default function AboutPage() {
   useDocumentTitle('À propos');
+  const {setReflexLabOpen} = usePlatform();
+
   return (
     <div className="container-page max-w-4xl pt-10">
       <div className="flex flex-col items-center text-center">
         <LogoMark className="h-20 w-20 animate-fade-up" title={null} />
-        <h1 className="mt-6 animate-fade-up font-display text-4xl font-black sm:text-5xl">
+        <span className="hud-tag text-accent-3 mt-4">
+          <Cpu size={12} /> IDENTITÉ VISUELLE // PRISM-DECK HOLO-CARTOUCHE
+        </span>
+        <h1 className="mt-4 animate-fade-up font-display text-4xl font-black sm:text-5xl">
           À propos d'<span className="text-gradient">{BRAND.name}</span>
         </h1>
         <p className="mt-3 text-sm font-semibold uppercase tracking-[0.3em] text-ink-faint">Créé et développé par {BRAND.creator}</p>
       </div>
 
-      <blockquote className="glass mt-10 rounded-3xl p-6 text-lg leading-relaxed sm:p-8">
+      <blockquote className="holo-panel reticle-frame mt-10 rounded-3xl p-6 text-lg leading-relaxed sm:p-8">
         <p>« {BRAND.aboutStatement} »</p>
         <footer className="mt-4 text-sm font-semibold text-ink-muted">— {BRAND.creator}</footer>
       </blockquote>
@@ -37,13 +44,35 @@ export default function AboutPage() {
 
       <ul className="mt-10 grid gap-4 sm:grid-cols-2">
         {PILLARS.map(({Icon, title, text}) => (
-          <li key={title} className="glass rounded-2xl p-5">
+          <li key={title} className="holo-panel rounded-2xl p-5">
             <Icon size={22} className="text-accent-3" />
             <h2 className="mt-3 font-display text-lg font-bold">{title}</h2>
             <p className="mt-1 text-sm text-ink-muted">{text}</p>
           </li>
         ))}
       </ul>
+
+      {/* Interactive Atelier Showcase */}
+      <section className="holo-panel reticle-frame mt-10 flex flex-col justify-between gap-4 rounded-2xl p-6 sm:flex-row sm:items-center">
+        <div>
+          <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+            <Layers size={18} className="text-accent-3" /> L'Atelier Holographique &amp; Calibrateur
+          </h2>
+          <p className="mt-1 max-w-xl text-sm text-ink-muted">
+            Chaque jeu est présenté comme une cartouche holographique inspectable en 3D, accompagnée d'un synthétiseur sonore Web Audio et
+            d'un calibrateur de réflexes intégré.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            playClickPulse();
+            setReflexLabOpen(true);
+          }}
+          className="btn-primary shrink-0">
+          <Crosshair size={16} /> Tester le Calibrateur
+        </button>
+      </section>
 
       <section className="mt-10 rounded-2xl border p-5 text-sm text-ink-muted border-line-soft">
         <h2 className="mb-2 font-display text-base font-bold text-ink">Ce qui appartient à qui</h2>

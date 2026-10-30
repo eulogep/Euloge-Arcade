@@ -3,6 +3,7 @@ import {ENV} from '@/config/env';
 import {newlyEarned, type RunRecord} from '@/features/achievements/evaluate';
 import {readJson, STORAGE_KEYS, writeJson} from '@/lib/storage';
 import {applySeasonalTheme} from '@/lib/season';
+import {playAchievementFanfare, playCartridgeLock, playFavoriteChime, setSoundEnabled} from '@/lib/sound';
 import * as auth from '@/services/authService';
 import type {Profile} from '@/services/authService';
 import {loadCatalog, loadPopularity, type CatalogData} from '@/services/catalogService';
@@ -16,14 +17,24 @@ import {
 } from '@/services/userDataService';
 import type {Game} from '@/types/game';
 
+export type ChromaSkin = 'obsidian' | 'gold' | 'phosphor';
+
 export interface Settings {
   theme: 'dark' | 'light';
+  skin: ChromaSkin;
+  soundEnabled: boolean;
   reducedMotion: boolean;
   /** Guest consent for on-device recommendations (signed-in players use their profile). */
   recommendationsConsent: boolean;
 }
 
-const DEFAULT_SETTINGS: Settings = {theme: 'dark', reducedMotion: false, recommendationsConsent: false};
+const DEFAULT_SETTINGS: Settings = {
+  theme: 'dark',
+  skin: 'obsidian',
+  soundEnabled: true,
+  reducedMotion: false,
+  recommendationsConsent: false,
+};
 
 export interface Toast {
   id: number;
@@ -71,6 +82,13 @@ interface PlatformContextValue {
   recommendationsConsent: boolean;
   setRecommendationsConsent: (on: boolean) => Promise<void>;
 
+  inspectGame: Game | null;
+  setInspectGame: (game: Game | null) => void;
+  commandPaletteOpen: boolean;
+  setCommandPaletteOpen: (open: boolean) => void;
+  reflexLabOpen: boolean;
+  setReflexLabOpen: (open: boolean) => void;
+
   toasts: Toast[];
   notify: (toast: Omit<Toast, 'id'>) => void;
   dismissToast: (id: number) => void;
@@ -87,9 +105,15 @@ export function usePlatform(): PlatformContextValue {
 function applySettingsToDocument(settings: Settings) {
   const root = document.documentElement;
   root.dataset.theme = settings.theme;
+  if (settings.skin && settings.skin !== 'obsidian') {
+    root.dataset.skin = settings.skin;
+  } else {
+    delete root.dataset.skin;
+  }
   applySeasonalTheme(root);
   if (settings.reducedMotion) root.dataset.motion = 'reduced';
   else delete root.dataset.motion;
+  setSoundEnabled(settings.soundEnabled);
 }
 
 export function PlatformProvider({children}: {children: ReactNode}) {
@@ -118,6 +142,11 @@ export function PlatformProvider({children}: {children: ReactNode}) {
   const games = useMemo(() => (catalog.status === 'ready' ? catalog.games : []), [catalog]);
   const gameById = useMemo(() => new Map(games.map((g) => [g.id, g])), [games]);
   const slugById = useMemo(() => new Map(games.map((g) => [g.id, g.slug])), [games]);
+
+  // ---- Interactive overlays (Inspector, Command Deck, Reflex Lab) -----------
+  const [inspectGame, setInspectGame] = useState<Game | null>(null);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [reflexLabOpen, setReflexLabOpen] = useState(false);
 
   // ---- Settings -------------------------------------------------------------
   const [settings, setSettings] = useState<Settings>(() => ({
@@ -250,6 +279,7 @@ export function PlatformProvider({children}: {children: ReactNode}) {
       .then(() => {
         const now = new Date().toISOString();
         setUnlocked((u) => [...u, ...earned.map((id) => ({id, unlockedAt: now}))]);
+        playAchievementFanfare();
         for (const id of earned) {
           notify({tone: 'achievement', title: 'Succès débloqué', body: achievementTitles.get(id)});
         }
@@ -263,6 +293,7 @@ export function PlatformProvider({children}: {children: ReactNode}) {
   const toggleFavorite = useCallback(
     async (game: Game) => {
       const on = !favorites.has(game.id);
+      playFavoriteChime(on);
       setFavorites((prev) => {
         const next = new Set(prev);
         if (on) next.add(game.id);
@@ -280,7 +311,7 @@ export function PlatformProvider({children}: {children: ReactNode}) {
           else next.add(game.id);
           return next;
         });
-        notify({tone: 'error', title: "Impossible de mettre à jour les favoris"});
+        notify({tone: 'error', title: 'Impossible de mettre à jour les favoris'});
       }
     },
     [favorites, store, notify],
@@ -288,6 +319,7 @@ export function PlatformProvider({children}: {children: ReactNode}) {
 
   const recordLaunch = useCallback(
     (game: Game) => {
+      playCartridgeLock();
       setHistory((h) => [{gameId: game.id, playedAt: new Date().toISOString()}, ...h].slice(0, 100));
       store.recordLaunch(game.id).catch((err) => console.error('[history] record failed', err));
     },
@@ -349,6 +381,12 @@ export function PlatformProvider({children}: {children: ReactNode}) {
     updateSettings,
     recommendationsConsent,
     setRecommendationsConsent,
+    inspectGame,
+    setInspectGame,
+    commandPaletteOpen,
+    setCommandPaletteOpen,
+    reflexLabOpen,
+    setReflexLabOpen,
     toasts,
     notify,
     dismissToast,

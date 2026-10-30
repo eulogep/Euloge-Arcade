@@ -6,36 +6,66 @@
 @tailwind utilities;
 
 /* ---------------------------------------------------------------------------
- * Theme tokens (RGB triplets so Tailwind can apply alpha)
- * Dark is the default; light is opt-in from the profile settings.
+ * PRISM-DECK // ATELIER HOLO-CARTOUCHE — Theme & Chroma Skin Tokens
+ * RGB triplets so Tailwind can apply alpha modifiers cleanly.
+ * Contrast ratios are strictly verified >= 4.5:1 (WCAG 2.1 AA).
  * ------------------------------------------------------------------------- */
 :root,
 [data-theme='dark'] {
-  --bg: 7 9 20;
-  --surface: 14 18 38;
-  --surface-2: 22 27 54;
+  --bg: 6 8 19;
+  --surface: 13 17 36;
+  --surface-2: 21 27 54;
   --line: 255 255 255;
-  --ink: 236 240 255;
-  --ink-muted: 166 176 210;
-  --ink-faint: 140 150 190;
+  --ink: 238 242 255;
+  --ink-muted: 170 180 214;
+  --ink-faint: 144 154 194;
   --accent: 47 123 255;
   --accent-2: 162 77 255;
   --accent-3: 56 225 255;
   --success: 52 211 153;
   --warning: 251 191 36;
   --danger: 251 76 110;
-  --line-alpha: 0.08;
+  --line-alpha: 0.09;
   color-scheme: dark;
 }
 
+/* Chroma Skin 2: Atelier Cyber-Or (Carbon & Molten Gold) */
+[data-theme='dark'][data-skin='gold'] {
+  --bg: 10 8 7;
+  --surface: 20 16 14;
+  --surface-2: 31 25 21;
+  --ink: 250 245 235;
+  --ink-muted: 204 190 168;
+  --ink-faint: 168 154 134;
+  --accent: 245 158 11;
+  --accent-2: 244 63 94;
+  --accent-3: 253 224 71;
+  --line-alpha: 0.1;
+}
+
+/* Chroma Skin 3: Terminal Phosphore (CRT Matrix & Bio-Emerald) */
+[data-theme='dark'][data-skin='phosphor'] {
+  --bg: 4 12 9;
+  --surface: 9 23 18;
+  --surface-2: 15 36 28;
+  --ink: 235 255 247;
+  --ink-muted: 172 224 202;
+  --ink-faint: 148 202 180;
+  --accent: 16 185 129;
+  --accent-2: 6 182 212;
+  --accent-3: 110 231 183;
+  --line-alpha: 0.1;
+}
+
+/* Daylight Prism (High-clarity architectural light mode) */
 [data-theme='light'] {
   --bg: 244 246 252;
   --surface: 255 255 255;
   --surface-2: 234 238 248;
   --line: 15 23 42;
   --ink: 12 16 36;
-  --ink-muted: 70 80 112;
-  --ink-faint: 92 100 130;
+  --ink-muted: 66 76 108;
+  --ink-faint: 88 96 126;
   --accent: 29 78 216;
   --accent-2: 126 34 206;
   --accent-3: 8 145 178;
@@ -46,12 +76,18 @@
   color-scheme: light;
 }
 
-/* October event: seasonal accents layered over the user's light/dark choice. */
-[data-season='halloween'] {
+/* October event: seasonal accents layered when using default skin */
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) {
   --accent: 255 112 31;
   --accent-2: 160 74 255;
   --accent-3: 255 190 62;
   --warning: 255 174 48;
+}
+[data-theme='light'][data-season='halloween'] {
+  --accent: 194 65 12;
+  --accent-2: 126 34 206;
+  --accent-3: 180 83 9;
+  --warning: 161 98 7;
 }
 
 @layer base {
@@ -62,22 +98,37 @@
   body {
     @apply bg-bg font-sans text-ink antialiased;
     min-height: 100dvh;
+    overflow-x: hidden;
   }
-  /* Subtle ambient glow behind every page */
+  /* Architectural Holo-Grid + Aurora Field behind every page */
   body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(64rem 42rem at 12% -8%, rgb(var(--accent) / 0.16), transparent 62%),
+      radial-gradient(54rem 38rem at 96% 4%, rgb(var(--accent-2) / 0.14), transparent 64%),
+      radial-gradient(40rem 30rem at 50% 100%, rgb(var(--accent-3) / 0.06), transparent 65%);
+  }
+  body::after {
     content: '';
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background:
-      radial-gradient(60rem 40rem at 10% -10%, rgb(var(--accent) / 0.14), transparent 60%),
-      radial-gradient(50rem 35rem at 100% 0%, rgb(var(--accent-2) / 0.12), transparent 60%);
+    opacity: 0.24;
+    background-image:
+      linear-gradient(to right, rgb(var(--line) / 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--line) / 0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000 20%, transparent 85%);
   }
-  [data-season='halloween'] body::before {
+  [data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) body::before {
     background:
-      radial-gradient(42rem 28rem at 8% -5%, rgb(255 119 31 / 0.2), transparent 62%),
-      radial-gradient(48rem 34rem at 100% 2%, rgb(141 67 255 / 0.18), transparent 64%),
+      radial-gradient(46rem 30rem at 8% -5%, rgb(255 119 31 / 0.2), transparent 62%),
+      radial-gradient(50rem 36rem at 100% 2%, rgb(141 67 255 / 0.18), transparent 64%),
       linear-gradient(180deg, rgb(255 108 20 / 0.025), transparent 28rem);
   }
   h1, h2, h3, h4 {
@@ -98,26 +149,65 @@
     border-color: rgb(var(--line) / var(--line-alpha));
   }
   .glass {
-    background: rgb(var(--surface) / 0.62);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    background: rgb(var(--surface) / 0.72);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
     border: 1px solid rgb(var(--line) / var(--line-alpha));
+  }
+  /* Precision Holo-Panel with subtle top highlight and technical border */
+  .holo-panel {
+    position: relative;
+    background: linear-gradient(165deg, rgb(var(--surface-2) / 0.72) 0%, rgb(var(--surface) / 0.88) 100%);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgb(var(--line) / var(--line-alpha));
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.08),
+      0 20px 50px -24px rgb(0 0 0 / 0.65);
+  }
+  /* Corner Reticle Ticks (inspired by the chamfered E monogram) */
+  .reticle-frame {
+    position: relative;
+  }
+  .reticle-frame::before,
+  .reticle-frame::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    border-color: rgb(var(--accent-3) / 0.55);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  .reticle-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid rgb(var(--accent-3) / 0.6);
+    border-left: 2px solid rgb(var(--accent-3) / 0.6);
+    border-top-left-radius: 4px;
+  }
+  .reticle-frame::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid rgb(var(--accent-2) / 0.6);
+    border-right: 2px solid rgb(var(--accent-2) / 0.6);
+    border-bottom-right-radius: 4px;
   }
   .text-gradient {
     @apply bg-brand-gradient bg-clip-text text-transparent;
   }
   .container-page {
-    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10;
+    @apply mx-auto w-full max-w-[1420px] px-4 sm:px-6 lg:px-10;
   }
   .btn {
-    @apply inline-flex min-h-[44px] select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition
+    @apply relative inline-flex min-h-[44px] select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition
       duration-200 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
     @apply btn bg-brand-gradient text-white shadow-glow hover:brightness-110 active:scale-[0.98];
   }
   .btn-secondary {
-    @apply btn glass text-ink hover:bg-surface-2;
+    @apply btn glass text-ink hover:border-accent-3/40 hover:bg-surface-2;
   }
   .btn-ghost {
     @apply btn text-ink-muted hover:bg-surface-2 hover:text-ink;
@@ -128,8 +218,13 @@
   .chip {
     @apply inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition border-line-soft;
   }
+  .hud-tag {
+    @apply inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] border-line-soft;
+    background: rgb(var(--surface-2) / 0.75);
+    color: rgb(var(--ink-muted));
+  }
   .input {
-    @apply w-full min-h-[44px] rounded-xl border bg-surface/80 px-3 text-sm text-ink placeholder:text-ink-faint
+    @apply w-full min-h-[44px] rounded-xl border bg-surface/85 px-3 text-sm text-ink placeholder:text-ink-faint
       transition border-line-soft focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/30;
   }
   .label {
@@ -147,12 +242,45 @@
   }
 }
 
+/* Cartridge Shell & Holographic Foil Effects */
+.game-card-shell {
+  position: relative;
+  background: linear-gradient(170deg, rgb(var(--surface-2) / 0.65) 0%, rgb(var(--surface)) 65%);
+}
+.game-card-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgb(var(--accent-3) / 0.45) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgb(var(--accent-2) / 0.45) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.group:hover > .game-card-shell::before,
+.group:focus-within > .game-card-shell::before {
+  opacity: 1;
+}
+
 .halloween-atmosphere,
 .halloween-badge {
   display: none;
 }
 
-[data-season='halloween'] .halloween-atmosphere {
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) .halloween-atmosphere {
   display: block;
   position: fixed;
   inset: 0;
@@ -161,7 +289,7 @@
   pointer-events: none;
 }
 
-[data-season='halloween'] .halloween-badge {
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) .halloween-badge {
   display: inline-flex;
 }
 
@@ -287,7 +415,7 @@
   box-shadow: inset 0 0 9rem rgb(24 4 38 / 0.25);
 }
 
-[data-season='halloween'] .hero-carousel::after {
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) .hero-carousel::after {
   content: '';
   position: absolute;
   inset: auto 0 0;
@@ -297,11 +425,11 @@
   background: linear-gradient(0deg, rgb(76 20 4 / 0.22), transparent);
 }
 
-[data-season='halloween'] .game-card-shell {
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) .game-card-shell {
   border-color: rgb(var(--accent) / 0.2);
 }
-[data-season='halloween'] .group:hover > .game-card-shell,
-[data-season='halloween'] .group:focus-within > .game-card-shell {
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) .group:hover > .game-card-shell,
+[data-season='halloween']:not([data-skin='gold']):not([data-skin='phosphor']) .group:focus-within > .game-card-shell {
   box-shadow:
     0 0 0 1px rgb(var(--accent-3) / 0.3),
     0 18px 50px -18px rgb(var(--accent) / 0.55),

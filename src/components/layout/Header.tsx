@@ -1,10 +1,26 @@
-import {Dices, Ghost, Heart, Home, LayoutGrid, LogIn, LogOut, Search, Shield, User} from 'lucide-react';
+import {
+  Command,
+  Dices,
+  Ghost,
+  Heart,
+  Home,
+  LayoutGrid,
+  LogIn,
+  LogOut,
+  Palette,
+  Search,
+  Shield,
+  User,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
-import {usePlatform} from '@/app/PlatformProvider';
+import {usePlatform, type ChromaSkin} from '@/app/PlatformProvider';
 import {Logo} from '@/components/ui/Logo';
 import {cn} from '@/lib/cn';
 import {pickRandom} from '@/lib/catalog';
+import {playClickPulse} from '@/lib/sound';
 
 const NAV = [
   {to: '/', label: 'Accueil', Icon: Home, end: true},
@@ -16,6 +32,7 @@ export function useSurprise() {
   const {games} = usePlatform();
   const navigate = useNavigate();
   return () => {
+    playClickPulse();
     const playable = games.filter((g) => g.linkStatus !== 'broken');
     const g = pickRandom(playable);
     if (g) navigate(`/jeux/${g.slug}`);
@@ -61,7 +78,7 @@ function HeaderSearch() {
         e.preventDefault();
         go(value.trim());
       }}>
-      <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+      <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint" />
       <input
         ref={inputRef}
         type="search"
@@ -74,10 +91,106 @@ function HeaderSearch() {
         aria-label="Rechercher un jeu"
         className="input h-10 min-h-0 rounded-full pl-9 pr-10"
       />
-      <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border px-1.5 text-[10px] text-ink-faint border-line-soft md:block">
+      <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border px-1.5 font-mono text-[10px] text-ink-faint border-line-soft md:block">
         /
       </kbd>
     </form>
+  );
+}
+
+function ChromaMenu() {
+  const {settings, updateSettings, notify} = usePlatform();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const skins: {id: ChromaSkin; theme: 'dark' | 'light'; label: string; dot: string}[] = [
+    {id: 'obsidian', theme: 'dark', label: 'Obsidian Pulse', dot: 'bg-[#38E1FF]'},
+    {id: 'gold', theme: 'dark', label: 'Atelier Cyber-Or', dot: 'bg-[#F59E0B]'},
+    {id: 'phosphor', theme: 'dark', label: 'Terminal Phosphore', dot: 'bg-[#10B981]'},
+    {id: 'obsidian', theme: 'light', label: 'Prisme Solaire (Clair)', dot: 'bg-[#2563EB]'},
+  ];
+
+  return (
+    <div ref={ref} className="relative hidden sm:block">
+      <button
+        type="button"
+        onClick={() => {
+          playClickPulse();
+          setOpen((o) => !o);
+        }}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        className="btn-ghost h-10 min-h-0 w-10 px-0"
+        title="Studio d'atmosphère & son tactile"
+        aria-label="Studio d'atmosphère et son">
+        <Palette size={17} className="text-accent-3" />
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="holo-panel reticle-frame absolute right-0 top-12 z-50 w-60 animate-fade-in rounded-2xl p-2 shadow-card">
+          <p className="px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-faint">
+            Atmosphère Visuelle
+          </p>
+          {skins.map((s) => {
+            const active =
+              s.theme === 'light'
+                ? settings.theme === 'light'
+                : settings.theme === 'dark' && settings.skin === s.id;
+            return (
+              <button
+                key={s.label}
+                role="menuitem"
+                type="button"
+                onClick={() => {
+                  playClickPulse();
+                  updateSettings({theme: s.theme, skin: s.id});
+                  notify({tone: 'info', title: `Atmosphère : ${s.label}`});
+                  setOpen(false);
+                }}
+                className={cn(
+                  'flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-semibold transition hover:bg-surface-2',
+                  active ? 'bg-accent/15 text-ink' : 'text-ink-muted',
+                )}>
+                <span className="flex items-center gap-2">
+                  <span className={cn('h-2.5 w-2.5 rounded-full', s.dot)} />
+                  {s.label}
+                </span>
+                {active && <span className="font-mono text-[10px] text-accent-3">ACTIF</span>}
+              </button>
+            );
+          })}
+          <div className="my-1 border-t border-line-soft" />
+          <button
+            role="menuitem"
+            type="button"
+            onClick={() => {
+              const next = !settings.soundEnabled;
+              updateSettings({soundEnabled: next});
+              if (next) playClickPulse();
+            }}
+            className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-semibold text-ink-muted hover:bg-surface-2 hover:text-ink">
+            <span className="flex items-center gap-2">
+              {settings.soundEnabled ? <Volume2 size={14} className="text-accent-3" /> : <VolumeX size={14} />}
+              Audio tactile
+            </span>
+            <span className="font-mono text-[10px] text-accent-3">{settings.soundEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -165,6 +278,7 @@ export function Avatar({url, name, size = 32}: {url: string | null; name: string
 
 export function Header() {
   const surprise = useSurprise();
+  const {favorites, setCommandPaletteOpen} = usePlatform();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -182,7 +296,7 @@ export function Header() {
       <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
         Aller au contenu
       </a>
-      <div className="container-page flex h-16 items-center gap-3 sm:gap-6">
+      <div className="container-page flex h-16 items-center gap-2.5 sm:gap-5">
         <Link to="/" className="shrink-0 rounded-lg" aria-label="Euloge Arcade — accueil">
           <Logo className="hidden sm:inline-flex" />
           <Logo compact className="sm:hidden" />
@@ -196,15 +310,23 @@ export function Header() {
               key={to}
               to={to}
               end={end}
+              onClick={() => playClickPulse()}
               className={({isActive}) =>
                 cn(
-                  'relative rounded-lg px-3 py-2 text-sm font-semibold transition',
+                  'relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition',
                   isActive ? 'text-ink' : 'text-ink-muted hover:text-ink',
                 )
               }>
               {({isActive}) => (
                 <>
                   {label}
+                  {to === '/favoris' && favorites.size > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="rounded-full bg-accent/20 px-1.5 py-0.2 font-mono text-[10px] font-bold text-accent-3">
+                      {favorites.size}
+                    </span>
+                  )}
                   {isActive && <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-brand-gradient" />}
                 </>
               )}
@@ -214,11 +336,24 @@ export function Header() {
         <div className="flex flex-1 justify-end md:justify-center">
           <HeaderSearch />
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            playClickPulse();
+            setCommandPaletteOpen(true);
+          }}
+          className="btn-ghost hidden h-10 min-h-0 shrink-0 px-2.5 xl:inline-flex"
+          title="Ouvrir la console de commande (⌘K / Ctrl+K)"
+          aria-label="Console de commande">
+          <Command size={16} className="text-accent-3" />
+          <kbd className="rounded border px-1.5 py-0.5 font-mono text-[10px] text-ink-faint border-line-soft">⌘K</kbd>
+        </button>
         <button type="button" onClick={surprise} className="btn-ghost h-10 min-h-0 shrink-0 px-2.5" title="Surprends-moi : un jeu au hasard">
-          <Dices size={18} />
+          <Dices size={18} className="text-accent-3" />
           <span className="hidden lg:inline">Surprends-moi</span>
           <span className="sr-only lg:hidden">Surprends-moi : un jeu au hasard</span>
         </button>
+        <ChromaMenu />
         <AccountMenu />
       </div>
     </header>

@@ -31,18 +31,23 @@ Pour régénérer les images PNG : `npm run brand:assets`.
 
 **À éviter** : déformer le monogramme, recolorer le dégradé hors palette, rattacher la barre centrale au fût, placer le logo sur un visuel chargé sans fond.
 
-## Palette (tokens)
+## Palette & Studio d'Atmosphère (PRISM-DECK // ATELIER HOLO-CARTOUCHE)
 
-Les couleurs sont définies en variables CSS dans `src/styles/index.css` (thème sombre par défaut, thème clair en option) et exposées dans Tailwind (`bg`, `surface`, `ink`, `accent`…).
+Les couleurs sont définies en variables CSS dans `src/styles/index.css` et exposées dans Tailwind (`bg`, `surface`, `ink`, `accent`…). L'identité visuelle **PRISM-DECK // ATELIER HOLO-CARTOUCHE** traite chaque jeu comme une cartouche holographique matérielle (`EA-XXX`) dotée d'encoches biseautées (`.reticle-frame`), de panneaux de verre télémétriques (`.holo-panel`) et de quatre atmosphères visuelles sélectionnables en temps réel :
 
-| Token | Sombre | Rôle |
+1. **Obsidian Pulse** (`data-theme="dark"`, défaut) : Saphir électrique (`#2F7BFF`), plasma violet (`#A24DFF`) et cyan laser (`#38E1FF`) sur fond obsidienne (`#060813`).
+2. **Atelier Cyber-Or** (`data-theme="dark" data-skin="gold"`) : Carbone profond (`#0A0807`), or solaire (`#F59E0B`), ambre (`#FDE047`) et rubis (`#F43F5E`).
+3. **Terminal Phosphore** (`data-theme="dark" data-skin="phosphor"`) : Matrice CRT (`#040C09`) et bio-émeraude haute lisibilité (`#10B981` / `#6EE7B7`).
+4. **Prisme Solaire** (`data-theme="light"`) : Clarté architecturale haute lisibilité sur fond ivoire-opale (`#F4F6FC`).
+
+| Token | Sombre (Obsidian Pulse) | Rôle |
 | --- | --- | --- |
-| `--bg` | `#070914` | Fond |
-| `--surface` / `--surface-2` | `#0E1226` / `#161B36` | Cartes, panneaux |
+| `--bg` | `#060813` | Fond architectural + grille de perspective holographique |
+| `--surface` / `--surface-2` | `#0D1124` / `#151B36` | Cartouches, panneaux `.holo-panel` |
 | `--accent` | `#2F7BFF` | Bleu électrique, couleur principale |
 | `--accent-2` | `#A24DFF` | Violet |
 | `--accent-3` | `#38E1FF` | Cyan, pour la lumière et les états actifs |
-| `--ink` / `--ink-muted` / `--ink-faint` | `#ECF0FF` / `#A6B0D2` / `#8C96BE` | Texte. Les contrastes sont vérifiés WCAG AA par axe. |
+| `--ink` / `--ink-muted` / `--ink-faint` | `#EEF2FF` / `#AAB4D6` / `#909AC2` | Texte. Les contrastes sont vérifiés WCAG AA par axe sur toutes les atmosphères. |
 
 ## Typographie
 
