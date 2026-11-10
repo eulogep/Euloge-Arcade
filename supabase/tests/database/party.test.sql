@@ -1,8 +1,8 @@
--- Online party rooms (Loups de Minuit): authorization, secrecy and game flow.
+-- Online party rooms (Loups de Minuit & Chroma Clash): authorization, secrecy and game flow.
 -- Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(35);
+select plan(47);
 
 insert into auth.users (id, email, aud, role)
 select ('00000000-0000-4000-8000-0000000000c' || i)::uuid, 'p' || i || '@party.test', 'authenticated', 'authenticated'
@@ -129,6 +129,52 @@ select is(
 select pg_temp.act('00000000-0000-4000-8000-0000000000c1');
 select lives_ok($$select public.party_advance((select v from t where k = 'room')::uuid)$$, 'the host brings everyone back to the lobby');
 select is(public.party_state((select v from t where k = 'room')::uuid) -> 'room' ->> 'status', 'lobby', 'ready for another game');
+
+-- Chroma Clash Online (Secrecy & Server Authority) ------------------------
+select pg_temp.act('00000000-0000-4000-8000-0000000000c1');
+insert into t select 'c_room', (public.party_create_room('chroma-clash', 'Awa') ->> 'room_id');
+insert into t select 'c_code', (select (public.chroma_state((select v from t where k = 'c_room')::uuid) -> 'room' ->> 'code'));
+
+select pg_temp.act('00000000-0000-4000-8000-0000000000c2');
+select lives_ok($$select public.party_join_room((select v from t where k = 'c_code'), 'Bilal')$$, 'second player joins Chroma Clash room');
+
+select pg_temp.act('00000000-0000-4000-8000-0000000000c5');
+select throws_ok($$select public.chroma_state((select v from t where k = 'c_room')::uuid)$$, 'P0002', null, 'outsiders cannot read Chroma Clash state');
+
+select pg_temp.act('00000000-0000-4000-8000-0000000000c1');
+select lives_ok($$select public.chroma_update_settings((select v from t where k = 'c_room')::uuid, '{"bots": 1, "combos": true, "stacking": true, "sevenZero": true}'::jsonb)$$, 'host updates Chroma Clash settings');
+select lives_ok($$select public.chroma_start((select v from t where k = 'c_room')::uuid, false)$$, 'host starts Chroma Clash match');
+
+select throws_ok($$select * from public.chroma_secrets$$, '42501', null, 'chroma_secrets table is never readable directly by clients');
+
+select is(
+  jsonb_array_length(public.chroma_state((select v from t where k = 'c_room')::uuid) -> 'table' -> 'my_hand'),
+  7, 'player 1 receives their 7 private cards'
+);
+select is(
+  (public.chroma_state((select v from t where k = 'c_room')::uuid) -> 'table') ? 'draw',
+  false, 'draw pile cards are never exposed in chroma_state'
+);
+select is(
+  (select count(*)::int from jsonb_array_elements(public.chroma_state((select v from t where k = 'c_room')::uuid) -> 'table' -> 'seats') s where s ? 'hand'),
+  0, 'other seats never expose their hand array in chroma_state'
+);
+
+-- Verify Player 1 and Player 2 see completely disjoint private hands
+insert into t select 'p1_card0', (public.chroma_state((select v from t where k = 'c_room')::uuid) -> 'table' -> 'my_hand' -> 0 ->> 'id');
+select pg_temp.act('00000000-0000-4000-8000-0000000000c2');
+insert into t select 'p2_card0', (public.chroma_state((select v from t where k = 'c_room')::uuid) -> 'table' -> 'my_hand' -> 0 ->> 'id');
+select isnt((select v from t where k = 'p1_card0'), (select v from t where k = 'p2_card0'), 'each player sees only their own distinct hand');
+
+-- Verify turn & card ownership enforcement on the server
+select throws_ok($$select public.chroma_draw((select v from t where k = 'c_room')::uuid)$$, '42501', null, 'player 2 cannot draw on player 1 turn');
+
+select pg_temp.act('00000000-0000-4000-8000-0000000000c1');
+select throws_ok(
+  $$select public.chroma_play((select v from t where k = 'c_room')::uuid, array[(select v::int from t where k = 'p2_card0')])$$,
+  '22023', null, 'player 1 cannot play a card that belongs to player 2'
+);
+select lives_ok($$select public.chroma_draw((select v from t where k = 'c_room')::uuid)$$, 'player 1 can draw on their turn');
 
 select * from finish();
 rollback;

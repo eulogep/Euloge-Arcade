@@ -1,4 +1,13 @@
-import {computeGenreAffinity, computePlayerPrestige, getCartridgeCode, getDailyProtocol} from '@/lib/prestige';
+import {
+  CARD_BACK_COSMETICS,
+  computeGenreAffinity,
+  computePlayerPrestige,
+  getCartridgeCode,
+  getDailyProtocol,
+  loadCosmeticLoadout,
+  saveCosmeticLoadout,
+  TABLE_FELT_COSMETICS,
+} from '@/lib/prestige';
 import {bySlug, seedGames} from './fixtures';
 
 describe('prestige & daily protocol', () => {
@@ -62,6 +71,14 @@ describe('prestige & daily protocol', () => {
   it('formats a hardware cartridge code', () => {
     expect(getCartridgeCode(bySlug('system-breach'))).toBe('EA-SYS');
     expect(getCartridgeCode(bySlug('2048'))).toBe('EA-204');
+  });
+
+  it('persists and loads prestige cosmetic loadouts (card backs and table felts)', () => {
+    expect(CARD_BACK_COSMETICS.length).toBeGreaterThanOrEqual(5);
+    expect(TABLE_FELT_COSMETICS.length).toBeGreaterThanOrEqual(4);
+    const saved = saveCosmeticLoadout({cardBack: 'obsidian', tableFelt: 'emerald', unlockedLevel: 3});
+    expect(saved).toEqual({cardBack: 'obsidian', tableFelt: 'emerald', unlockedLevel: 3});
+    expect(loadCosmeticLoadout()).toEqual({cardBack: 'obsidian', tableFelt: 'emerald', unlockedLevel: 3});
   });
 });
 

@@ -24,7 +24,17 @@ import {usePlatform, type ChromaSkin} from '@/app/PlatformProvider';
 import {Avatar} from '@/components/layout/Header';
 import {useDocumentTitle} from '@/hooks/useDocumentTitle';
 import {cn} from '@/lib/cn';
-import {computeGenreAffinity, computePlayerPrestige, getCartridgeCode} from '@/lib/prestige';
+import {
+  CARD_BACK_COSMETICS,
+  computeGenreAffinity,
+  computePlayerPrestige,
+  getCartridgeCode,
+  loadCosmeticLoadout,
+  saveCosmeticLoadout,
+  TABLE_FELT_COSMETICS,
+  type CardBackCosmeticId,
+  type TableFeltCosmeticId,
+} from '@/lib/prestige';
 import {playClickPulse} from '@/lib/sound';
 import {deleteAccount, updateProfile, uploadAvatar} from '@/services/authService';
 
@@ -187,6 +197,27 @@ export default function ProfilePage() {
     [games, favorites, history],
   );
 
+  const [cosmetics, setCosmetics] = useState(() => loadCosmeticLoadout());
+
+  useEffect(() => {
+    const updated = saveCosmeticLoadout({unlockedLevel: prestige.level});
+    setCosmetics(updated);
+  }, [prestige.level]);
+
+  const selectCardBack = (id: CardBackCosmeticId) => {
+    playClickPulse();
+    const next = saveCosmeticLoadout({cardBack: id, unlockedLevel: prestige.level});
+    setCosmetics(next);
+    notify({tone: 'success', title: 'Dos de carte équipé', body: 'Synchronisé avec Chroma Clash · 4 Colors.'});
+  };
+
+  const selectTableFelt = (id: TableFeltCosmeticId) => {
+    playClickPulse();
+    const next = saveCosmeticLoadout({tableFelt: id, unlockedLevel: prestige.level});
+    setCosmetics(next);
+    notify({tone: 'success', title: 'Tapis de table équipé', body: 'Synchronisé avec Chroma Clash · 4 Colors.'});
+  };
+
   return (
     <div className="container-page space-y-8 pt-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -322,6 +353,134 @@ export default function ProfilePage() {
           )}
         </section>
       </div>
+
+      {/* Prestige Cosmetic Arsenal (Card Backs & Table Felts) */}
+      <section aria-labelledby="cosmetics-title" className="holo-panel reticle-frame rounded-3xl p-6">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span className="hud-tag text-accent-3 mb-1.5">
+              <Sparkles size={12} /> ARSENAL COSMÉTIQUE // RÉCOMPENSES DE PRESTIGE
+            </span>
+            <h2 id="cosmetics-title" className="font-display text-xl font-black">
+              Dos de Cartes Holographiques &amp; Tapis de Table
+            </h2>
+            <p className="mt-0.5 text-xs text-ink-muted">
+              Débloque gratuitement des finitions exclusives en montant de niveau (XP) et utilise-les directement dans{' '}
+              <Link to="/jeux/chroma-clash?jouer=1" className="font-semibold text-accent-3 hover:underline">
+                Chroma Clash · 4 Colors
+              </Link>
+              .
+            </p>
+          </div>
+          <span className="hud-tag">NIVEAU ACTUEL : N.{Math.max(prestige.level, cosmetics.unlockedLevel)}</span>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <p className="mb-2.5 font-mono text-xs font-bold uppercase tracking-wider text-ink-muted">
+              1. Dos de Cartes (Équipé : {CARD_BACK_COSMETICS.find((c) => c.id === cosmetics.cardBack)?.label})
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              {CARD_BACK_COSMETICS.map((item) => {
+                const effectiveLevel = Math.max(prestige.level, cosmetics.unlockedLevel);
+                const isUnlocked = effectiveLevel >= item.minLevel;
+                const isEquipped = cosmetics.cardBack === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    disabled={!isUnlocked}
+                    aria-pressed={isEquipped}
+                    onClick={() => selectCardBack(item.id)}
+                    className={cn(
+                      'group flex flex-col justify-between gap-3 rounded-2xl border p-3.5 text-left transition border-line-soft',
+                      isEquipped
+                        ? 'border-accent-3 bg-accent/15 shadow-glow'
+                        : isUnlocked
+                          ? 'bg-surface/60 hover:bg-surface-2'
+                          : 'cursor-not-allowed bg-surface/30 opacity-60',
+                    )}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        aria-hidden
+                        className="flex h-14 w-10 items-center justify-center rounded-lg border-2 border-white/85 shadow-md"
+                        style={{background: item.previewGradient}}>
+                        <span
+                          className="h-4 w-4 rotate-45 rounded-xs border border-white"
+                          style={{backgroundColor: item.accentHex}}
+                        />
+                      </span>
+                      {isEquipped ? (
+                        <span className="font-mono text-[10px] font-bold text-accent-3">ÉQUIPÉ</span>
+                      ) : isUnlocked ? (
+                        <span className="font-mono text-[10px] text-success">DÉBLOQUÉ</span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 font-mono text-[10px] text-warning">
+                          <Lock size={11} /> NIV. {item.minLevel}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-display text-sm font-bold text-ink">{item.label}</p>
+                      <p className="mt-0.5 text-[11px] leading-snug text-ink-muted">{item.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-line-soft pt-5">
+            <p className="mb-2.5 font-mono text-xs font-bold uppercase tracking-wider text-ink-muted">
+              2. Tapis de Table (Équipé : {TABLE_FELT_COSMETICS.find((t) => t.id === cosmetics.tableFelt)?.label})
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {TABLE_FELT_COSMETICS.map((felt) => {
+                const effectiveLevel = Math.max(prestige.level, cosmetics.unlockedLevel);
+                const isUnlocked = effectiveLevel >= felt.minLevel;
+                const isEquipped = cosmetics.tableFelt === felt.id;
+                return (
+                  <button
+                    key={felt.id}
+                    type="button"
+                    disabled={!isUnlocked}
+                    aria-pressed={isEquipped}
+                    onClick={() => selectTableFelt(felt.id)}
+                    className={cn(
+                      'flex flex-col justify-between gap-2.5 rounded-2xl border p-3.5 text-left transition border-line-soft',
+                      isEquipped
+                        ? 'border-accent-3 bg-accent/15 shadow-glow'
+                        : isUnlocked
+                          ? 'bg-surface/60 hover:bg-surface-2'
+                          : 'cursor-not-allowed bg-surface/30 opacity-60',
+                    )}>
+                    <div className="flex items-center justify-between">
+                      <span
+                        aria-hidden
+                        className="h-7 w-16 rounded-lg border border-white/30 shadow-inner"
+                        style={{background: felt.previewGradient}}
+                      />
+                      {isEquipped ? (
+                        <span className="font-mono text-[10px] font-bold text-accent-3">ÉQUIPÉ</span>
+                      ) : isUnlocked ? (
+                        <span className="font-mono text-[10px] text-success">DÉBLOQUÉ</span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 font-mono text-[10px] text-warning">
+                          <Lock size={11} /> NIV. {felt.minLevel}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-display text-sm font-bold text-ink">{felt.label}</p>
+                      <p className="mt-0.5 text-[11px] leading-snug text-ink-muted">{felt.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section aria-labelledby="ach-title">
         <h2 id="ach-title" className="section-title mb-4 flex items-center gap-2">

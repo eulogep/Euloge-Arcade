@@ -33,6 +33,15 @@ export interface Rules {
   combos: boolean;
   /** Answer a +2 / +3 with another one to pass the accumulated penalty. */
   stacking: boolean;
+  /** UNO 7-1 variant: playing a 7 swaps hands with a chosen player; playing a 1 rotates all hands in play direction. */
+  sevenZero?: boolean;
+}
+
+export interface PlayOptions {
+  /** Seat index to swap hands with when playing a 7 under rules.sevenZero. */
+  swapTarget?: number;
+  /** When true, forgetting to announce on 1 card marks the player vulnerable to a live Counter-UNO instead of auto-drawing. */
+  keepVulnerable?: boolean;
 }
 
 export interface GameState {
@@ -48,6 +57,8 @@ export interface GameState {
   drawnCardId: number | null;
   /** The current player announced "Dernière carte !" before playing. */
   announced: boolean;
+  /** Seat index currently vulnerable to a "Contre-1 !" call (forgot to announce UNO). */
+  vulnerableSeat?: number | null;
   winner: number | null;
   rules: Rules;
   /** Human-readable summary of the last move. */
@@ -58,8 +69,38 @@ export const HAND_SIZE = 7;
 export const MIN_SEATS = 2;
 export const MAX_SEATS = 8;
 export const FORGOT_PENALTY = 2;
+export const GAME_SCORE_WIN = 250;
 
 export const COLOR_LABELS: Record<Color, string> = {cyan: 'Cyan', rose: 'Rose', ambre: 'Ambre', vert: 'Vert'};
+
+/**
+ * Official Four-Colors / UNO point value of a single card remaining in an opponent's hand:
+ * - Number cards (1–9): face value (1–9 pts)
+ * - Action cards (Bond, Retour, +2): 20 pts
+ * - Wild cards (Prisme, Surcharge +3): 50 pts
+ */
+export function cardPoints(c: Card): number {
+  switch (c.kind) {
+    case 'num':
+      return c.value ?? 0;
+    case 'bond':
+    case 'retour':
+    case 'plus2':
+      return 20;
+    case 'prisme':
+    case 'surcharge':
+      return 50;
+  }
+}
+
+export function handPoints(hand: Card[]): number {
+  return hand.reduce((sum, c) => sum + cardPoints(c), 0);
+}
+
+/** Total points awarded to the round winner from all opponents' remaining hands. */
+export function winnerRoundPoints(s: GameState): number {
+  return s.seats.reduce((sum, seat, idx) => (idx === s.winner ? sum : sum + handPoints(seat.hand)), 0);
+}
 
 export function createDeck(): Card[] {
   const cards: Card[] = [];
@@ -124,6 +165,7 @@ export function newGame(seats: {name: string; bot: boolean}[], rules: Rules, rng
     pendingDraw: 0,
     drawnCardId: null,
     announced: false,
+    vulnerableSeat: null,
     winner: null,
     rules,
     lastEvent: `La partie commence sur ${cardLabel(first)}.`,
@@ -182,8 +224,40 @@ export function announce(s: GameState): GameState {
   return {...s, announced: true};
 }
 
+/** Pick the opponent seat with the fewest cards (default target for playing a 7 under rules.sevenZero). */
+export function bestSwapTarget(s: GameState, fromSeat = s.current): number {
+  let best = -1;
+  let bestCount = Infinity;
+  for (let i = 0; i < s.seats.length; i++) {
+    if (i === fromSeat) continue;
+    if (s.seats[i].hand.length < bestCount) {
+      bestCount = s.seats[i].hand.length;
+      best = i;
+    }
+  }
+  return best >= 0 ? best : (fromSeat + 1) % s.seats.length;
+}
+
+/** Call "Contre-1 !" against a player who dropped to 1 card without announcing UNO. */
+export function counterUno(s: GameState, rng: Rng = Math.random): GameState {
+  if (s.vulnerableSeat === null || s.vulnerableSeat === undefined) return s;
+  const target = s.vulnerableSeat;
+  const drawnState = drawCards({...s, vulnerableSeat: null}, target, FORGOT_PENALTY, rng).state;
+  return {
+    ...drawnState,
+    vulnerableSeat: null,
+    lastEvent: `Contre-1 ! ${s.seats[target].name} pioche +${FORGOT_PENALTY} cartes pour oubli d’annonce.`,
+  };
+}
+
 /** Plays the selected cards. `color` is required when the last card is wild. */
-export function play(s: GameState, ids: number[], color: Color | null = null, rng: Rng = Math.random): GameState {
+export function play(
+  s: GameState,
+  ids: number[],
+  color: Color | null = null,
+  rng: Rng = Math.random,
+  options?: PlayOptions,
+): GameState {
   if (!validSelection(ids, s)) throw new Error('Coup invalide');
   const me = s.current;
   const seat = s.seats[me];
@@ -197,17 +271,53 @@ export function play(s: GameState, ids: number[], color: Color | null = null, rn
     seats: s.seats.map((p, i) => (i === me ? {...p, hand} : p)),
     discard: [...s.discard, ...played],
     activeColor: isWild(last) ? color! : last.color!,
+    vulnerableSeat: null,
   };
   const name = seat.name;
   const what = played.length > 1 ? `${played.length} × ${last.value}` : cardLabel(last);
   let event = `${name} joue ${what}${isWild(last) ? ` et choisit ${COLOR_LABELS[color!]}` : ''}.`;
 
   if (hand.length === 0) {
-    return {...state, winner: me, drawnCardId: null, lastEvent: `${name} pose sa dernière carte et gagne !`};
+    return {...state, winner: me, drawnCardId: null, vulnerableSeat: null, lastEvent: `${name} pose sa dernière carte et gagne !`};
   }
-  if (hand.length === 1 && !s.announced) {
-    state = drawCards(state, me, FORGOT_PENALTY, rng).state;
-    event += ` Oubli de « Dernière carte ! » : +${FORGOT_PENALTY}.`;
+
+  // UNO 7–1 rule: 7 swaps hands with a chosen player; 1 rotates all hands in play direction
+  if (state.rules.sevenZero && last.kind === 'num') {
+    if (last.value === 7 && state.seats.length >= 2) {
+      const rawTarget = options?.swapTarget;
+      const target =
+        rawTarget !== undefined && rawTarget !== me && rawTarget >= 0 && rawTarget < state.seats.length
+          ? rawTarget
+          : bestSwapTarget(state, me);
+      const myHand = state.seats[me].hand;
+      const targetHand = state.seats[target].hand;
+      state = {
+        ...state,
+        seats: state.seats.map((p, i) => (i === me ? {...p, hand: targetHand} : i === target ? {...p, hand: myHand} : p)),
+      };
+      event += ` Échange de mains avec ${state.seats[target].name} (Règle du 7) !`;
+    } else if (last.value === 1 && state.seats.length >= 2) {
+      const n = state.seats.length;
+      const dir = state.direction;
+      state = {
+        ...state,
+        seats: state.seats.map((p, i) => {
+          const fromIdx = (((i - dir) % n) + n) % n;
+          return {...p, hand: state.seats[fromIdx].hand};
+        }),
+      };
+      event += ' Rotation de toutes les mains (Règle du 1) !';
+    }
+  }
+
+  if (state.seats[me].hand.length === 1 && !s.announced) {
+    if (options?.keepVulnerable) {
+      state = {...state, vulnerableSeat: me};
+      event += ' Attention : « 1 ! » non annoncé (Contre-1 disponible) !';
+    } else {
+      state = drawCards(state, me, FORGOT_PENALTY, rng).state;
+      event += ` Oubli de « Dernière carte ! » : +${FORGOT_PENALTY}.`;
+    }
   }
 
   let steps = 1;
@@ -241,12 +351,13 @@ export function play(s: GameState, ids: number[], color: Color | null = null, rn
 export function drawTurn(s: GameState, rng: Rng = Math.random): GameState {
   const me = s.current;
   const name = s.seats[me].name;
-  if (s.pendingDraw > 0) {
-    const {state, drawn} = drawCards(s, me, s.pendingDraw, rng);
+  const base = {...s, vulnerableSeat: null};
+  if (base.pendingDraw > 0) {
+    const {state, drawn} = drawCards(base, me, base.pendingDraw, rng);
     return {...endTurn({...state, pendingDraw: 0}, 1), lastEvent: `${name} pioche ${drawn.length} cartes.`};
   }
-  if (s.drawnCardId !== null) throw new Error('Déjà pioché');
-  const {state, drawn} = drawCards(s, me, 1, rng);
+  if (base.drawnCardId !== null) throw new Error('Déjà pioché');
+  const {state, drawn} = drawCards(base, me, 1, rng);
   if (drawn.length === 0) return {...endTurn(state, 1), lastEvent: `${name} ne peut pas piocher et passe.`};
   const next = {...state, drawnCardId: drawn[0].id};
   if (!canPlay(drawn[0], next)) return {...endTurn(state, 1), lastEvent: `${name} pioche et passe.`};
@@ -255,7 +366,7 @@ export function drawTurn(s: GameState, rng: Rng = Math.random): GameState {
 
 export function pass(s: GameState): GameState {
   if (s.drawnCardId === null) throw new Error('Pioche d’abord');
-  return {...endTurn(s, 1), lastEvent: `${s.seats[s.current].name} garde sa carte et passe.`};
+  return {...endTurn({...s, vulnerableSeat: null}, 1), lastEvent: `${s.seats[s.current].name} garde sa carte et passe.`};
 }
 
 export const playableCards = (s: GameState) => s.seats[s.current].hand.filter((c) => canPlay(c, s));

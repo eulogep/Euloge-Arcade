@@ -168,3 +168,150 @@ export function getCartridgeCode(game: Game): string {
   return `EA-${clean.slice(0, 3).padEnd(3, '0')}`;
 }
 
+export type CardBackCosmeticId = 'classic' | 'obsidian' | 'phosphor' | 'gold' | 'prisme';
+export type TableFeltCosmeticId = 'royal' | 'emerald' | 'nebula' | 'cyber_gold';
+
+export interface CosmeticItem<T extends string = string> {
+  id: T;
+  label: string;
+  description: string;
+  minLevel: number;
+  previewGradient: string;
+  accentHex: string;
+}
+
+export const CARD_BACK_COSMETICS: CosmeticItem<CardBackCosmeticId>[] = [
+  {
+    id: 'classic',
+    label: 'Carbone 4 Colors',
+    description: 'Dos fibre de carbone officiel avec losange 4 couleurs.',
+    minLevel: 1,
+    previewGradient: 'linear-gradient(135deg, #181c29 0%, #090c14 100%)',
+    accentHex: '#ef1c24',
+  },
+  {
+    id: 'obsidian',
+    label: 'Obsidian Pulse',
+    description: 'Saphir électrique et circuits plasma haute fréquence.',
+    minLevel: 1,
+    previewGradient: 'linear-gradient(135deg, #0b396e 0%, #1d1042 55%, #070a14 100%)',
+    accentHex: '#38e1ff',
+  },
+  {
+    id: 'phosphor',
+    label: 'Matrice Phosphore',
+    description: 'Grille bio-émeraude inspirée des terminaux CRT.',
+    minLevel: 2,
+    previewGradient: 'linear-gradient(135deg, #064e3b 0%, #022c22 65%, #03120e 100%)',
+    accentHex: '#34d399',
+  },
+  {
+    id: 'gold',
+    label: 'Atelier Cyber-Or',
+    description: 'Filigranes d’or solaire sur alliage d’obsidienne.',
+    minLevel: 3,
+    previewGradient: 'linear-gradient(135deg, #78350f 0%, #3b1704 60%, #140802 100%)',
+    accentHex: '#fbbf24',
+  },
+  {
+    id: 'prisme',
+    label: 'Prisme Holographique Ω',
+    description: 'Réfraction spectrale réservée aux vétérans de l’Arche.',
+    minLevel: 5,
+    previewGradient: 'linear-gradient(135deg, #2563eb 0%, #9333ea 50%, #ec4899 100%)',
+    accentHex: '#f472b6',
+  },
+];
+
+export const TABLE_FELT_COSMETICS: CosmeticItem<TableFeltCosmeticId>[] = [
+  {
+    id: 'royal',
+    label: 'Casino Bleu Royal',
+    description: 'Le tapis feutré bleu profond iconique de Four Colors.',
+    minLevel: 1,
+    previewGradient: 'radial-gradient(circle at 50% 45%, #0c4d91 0%, #062852 58%, #021229 100%)',
+    accentHex: '#38e1ff',
+  },
+  {
+    id: 'emerald',
+    label: 'Velours Émeraude',
+    description: 'Tapis de grand tournoi vert impérial et filets dorés.',
+    minLevel: 1,
+    previewGradient: 'radial-gradient(circle at 50% 45%, #0d6e4c 0%, #063d2a 58%, #021c13 100%)',
+    accentHex: '#34d399',
+  },
+  {
+    id: 'nebula',
+    label: 'Nébuleuse Cyber-Violette',
+    description: 'Arène synthwave aux reflets améthyste et magenta.',
+    minLevel: 2,
+    previewGradient: 'radial-gradient(circle at 50% 45%, #4c1d95 0%, #271052 58%, #0f0524 100%)',
+    accentHex: '#c084fc',
+  },
+  {
+    id: 'cyber_gold',
+    label: 'Forge Carbone & Or',
+    description: 'Table prestige anthracite rehaussée d’or incandescent.',
+    minLevel: 3,
+    previewGradient: 'radial-gradient(circle at 50% 45%, #5c3a09 0%, #2b1a04 58%, #120a01 100%)',
+    accentHex: '#fbbf24',
+  },
+];
+
+export interface CosmeticLoadout {
+  cardBack: CardBackCosmeticId;
+  tableFelt: TableFeltCosmeticId;
+  unlockedLevel: number;
+}
+
+const COSMETICS_STORAGE_KEY = 'euloge-arcade:cosmetics';
+let memoryCosmeticsFallback: string | null = null;
+
+function readCosmeticsRaw(): string | null {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.getItem === 'function') {
+      return window.localStorage.getItem(COSMETICS_STORAGE_KEY);
+    }
+  } catch {
+    /* ignore storage errors */
+  }
+  return memoryCosmeticsFallback;
+}
+
+function writeCosmeticsRaw(value: string): void {
+  memoryCosmeticsFallback = value;
+  try {
+    if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.setItem === 'function') {
+      window.localStorage.setItem(COSMETICS_STORAGE_KEY, value);
+    }
+  } catch {
+    /* ignore storage errors */
+  }
+}
+
+export function loadCosmeticLoadout(): CosmeticLoadout {
+  try {
+    const raw = readCosmeticsRaw();
+    if (!raw) return {cardBack: 'classic', tableFelt: 'royal', unlockedLevel: 1};
+    const parsed = JSON.parse(raw) as Partial<CosmeticLoadout>;
+    const cardBack = CARD_BACK_COSMETICS.some((c) => c.id === parsed.cardBack) ? parsed.cardBack! : 'classic';
+    const tableFelt = TABLE_FELT_COSMETICS.some((t) => t.id === parsed.tableFelt) ? parsed.tableFelt! : 'royal';
+    const unlockedLevel = typeof parsed.unlockedLevel === 'number' && parsed.unlockedLevel >= 1 ? parsed.unlockedLevel : 1;
+    return {cardBack, tableFelt, unlockedLevel};
+  } catch {
+    return {cardBack: 'classic', tableFelt: 'royal', unlockedLevel: 1};
+  }
+}
+
+export function saveCosmeticLoadout(next: Partial<CosmeticLoadout>): CosmeticLoadout {
+  const current = loadCosmeticLoadout();
+  const merged: CosmeticLoadout = {
+    cardBack: next.cardBack ?? current.cardBack,
+    tableFelt: next.tableFelt ?? current.tableFelt,
+    unlockedLevel: Math.max(current.unlockedLevel, next.unlockedLevel ?? 1),
+  };
+  writeCosmeticsRaw(JSON.stringify(merged));
+  return merged;
+}
+
+

@@ -3,13 +3,18 @@ import {seeded} from '../_party/rng';
 import {
   botMove,
   canPlay,
+  cardPoints,
+  counterUno,
   createDeck,
   drawTurn,
   FORGOT_PENALTY,
+  GAME_SCORE_WIN,
   HAND_SIZE,
+  handPoints,
   newGame,
   play,
   validSelection,
+  winnerRoundPoints,
   type Card,
   type GameState,
 } from './logic';
@@ -116,10 +121,71 @@ describe('Chroma Clash rules', () => {
     expect(() => play(s, [num(5, 'vert').id])).toThrow(/invalide/);
   });
 
+  it('computes Four-Colors round points from opponents remaining cards toward 250 pts', () => {
+    expect(GAME_SCORE_WIN).toBe(250);
+    expect(cardPoints(num(7, 'cyan'))).toBe(7);
+    expect(cardPoints(card('bond', 'rose'))).toBe(20);
+    expect(cardPoints(card('retour', 'vert'))).toBe(20);
+    expect(cardPoints(card('plus2', 'ambre'))).toBe(20);
+    expect(cardPoints(card('prisme', null))).toBe(50);
+    expect(cardPoints(card('surcharge', null))).toBe(50);
+
+    const winCard = num(5, 'cyan');
+    const oppHand = [num(9, 'rose'), card('plus2', 'vert'), card('prisme', null)];
+    expect(handPoints(oppHand)).toBe(79);
+    const finished = play(rigged([[winCard], oppHand], num(5, 'rose')), [winCard.id]);
+    expect(finished.winner).toBe(0);
+    expect(winnerRoundPoints(finished)).toBe(79);
+  });
+
+  it('supports UNO 7-1 variant (7 swaps hands, 1 rotates all hands in play direction)', () => {
+    const seven = num(7, 'cyan');
+    const h0Rest = [num(2, 'rose'), num(3, 'vert')];
+    const h1 = [num(8, 'ambre'), num(9, 'ambre'), num(4, 'vert')];
+    const h2 = [num(5, 'rose'), num(6, 'cyan')]; // fewest cards among opponents (2)
+    const s7 = rigged([[seven, ...h0Rest], h1, h2], num(7, 'rose'), {
+      rules: {combos: true, stacking: true, sevenZero: true},
+    });
+    const after7 = play(s7, [seven.id]);
+    expect(after7.seats[0].hand).toEqual(h2);
+    expect(after7.seats[2].hand).toEqual(h0Rest);
+
+    const one = num(1, 'cyan');
+    const p0Rest = [num(2, 'cyan'), num(3, 'cyan')];
+    const p1 = [num(4, 'rose'), num(5, 'rose')];
+    const p2 = [num(6, 'vert'), num(8, 'vert')];
+    const s1 = rigged([[one, ...p0Rest], p1, p2], num(1, 'ambre'), {
+      rules: {combos: true, stacking: true, sevenZero: true},
+      direction: 1,
+    });
+    const after1 = play(s1, [one.id]);
+    expect(after1.seats[1].hand).toEqual(p0Rest);
+    expect(after1.seats[2].hand).toEqual(p1);
+    expect(after1.seats[0].hand).toEqual(p2);
+  });
+
+  it('supports interactive Counter-UNO (keepVulnerable + counterUno)', () => {
+    const c = num(4, 'cyan');
+    const s = rigged([[c, num(9, 'rose')], [num(2, 'vert'), num(3, 'vert')]], num(4, 'rose'), {
+      announced: false,
+    });
+    const afterPlay = play(s, [c.id], null, seeded(7), {keepVulnerable: true});
+    expect(afterPlay.seats[0].hand).toHaveLength(1);
+    expect(afterPlay.vulnerableSeat).toBe(0);
+
+    const afterCounter = counterUno(afterPlay, seeded(7));
+    expect(afterCounter.vulnerableSeat).toBeNull();
+    expect(afterCounter.seats[0].hand).toHaveLength(1 + FORGOT_PENALTY);
+  });
+
   it('bots always finish a game with a winner and the deck conserved', () => {
     for (let seed = 1; seed <= 200; seed++) {
       const rng = seeded(seed);
-      let s = newGame(seats(2 + (seed % 7), true), {combos: seed % 2 === 0, stacking: seed % 3 !== 0}, rng);
+      let s = newGame(
+        seats(2 + (seed % 7), true),
+        {combos: seed % 2 === 0, stacking: seed % 3 !== 0, sevenZero: seed % 5 === 0},
+        rng,
+      );
       let turns = 0;
       while (s.winner === null && turns < 5000) {
         const m = botMove(s, rng);

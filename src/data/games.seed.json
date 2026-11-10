@@ -1733,5 +1733,142 @@
     "link_checked_at": null,
     "created_at": "2026-11-10T00:00:00Z",
     "updated_at": "2026-11-10T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000043",
+    "slug": "8-ball-pool",
+    "title": "Billard Cyber 8-Ball",
+    "tagline": "Empoche tes billes (pleines ou rayées) puis la 8 noire face à l'IA.",
+    "description": "Un billard 8-Ball complet jouable directement dans la console Holo-Cartouche : ligne de visée laser, jauge de puissance progressive, physique élastique réaliste sur 6 poches et duel tactique contre l'IA.",
+    "instructions": "Oriente ta queue de billard à la souris ou avec les flèches Gauche/Droite, puis maintiens le clic gauche ou la barre Espace pour doser la puissance avant de relâcher.",
+    "genre": [
+      "arcade",
+      "action"
+    ],
+    "cover_url": "/covers/8-ball-pool.jpg",
+    "banner_url": "/covers/8-ball-pool-banner.jpg",
+    "launch_mode": "external",
+    "launch_url": "https://www.crazygames.com/game/8-ball-billiards-classic",
+    "source_url": "https://www.crazygames.com/game/8-ball-billiards-classic",
+    "developer": "Euloge Arcade Studio",
+    "license_status": "link_only",
+    "license_notes": "Jouable nativement dans la Console Holo-Cartouche intégrée d'Euloge Arcade ou via le lien externe.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": true,
+      "gamepad": false,
+      "touch": true,
+      "verified": false
+    },
+    "controls": [
+      {
+        "device": "mouse",
+        "input": "Souris",
+        "action": "Viser la bille blanche"
+      },
+      {
+        "device": "keyboard",
+        "input": "Espace / Clic",
+        "action": "Maintenir pour charger et relâcher pour tirer"
+      }
+    ],
+    "orientation": "landscape",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-10-10T00:00:00Z",
+    "link_status": "ok",
+    "link_checked_at": "2026-10-10T00:00:00Z",
+    "created_at": "2026-10-10T00:00:00Z",
+    "updated_at": "2026-10-10T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000044",
+    "slug": "pac-man-neon",
+    "title": "Pac-Man Neon",
+    "tagline": "Dévore les pac-gommes et chasse les 4 fantômes dans le cyber-labyrinthe.",
+    "description": "Le grand classique de l'arcade revisité en néon haute fréquence : tunnels de téléportation, super-gommes énergétiques et les 4 fantômes (Blinky, Pinky, Inky, Clyde) dotés de leurs comportements de chasse et de fuite.",
+    "instructions": "Utilise les flèches directionnelles, ZQSD/WASD ou clique dans la direction souhaitée pour guider Pac-Man à travers le labyrinthe.",
+    "genre": [
+      "arcade",
+      "retro"
+    ],
+    "cover_url": "/covers/pac-man-neon.jpg",
+    "banner_url": "/covers/pac-man-neon-banner.jpg",
+    "launch_mode": "external",
+    "launch_url": "https://freepacman.org/",
+    "source_url": "https://freepacman.org/",
+    "developer": "Euloge Arcade Studio",
+    "license_status": "link_only",
+    "license_notes": "Jouable nativement dans la Console Holo-Cartouche intégrée d'Euloge Arcade ou via le lien externe.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": true,
+      "gamepad": false,
+      "touch": true,
+      "verified": false
+    },
+    "controls": [
+      {
+        "device": "keyboard",
+        "input": "Flèches / ZQSD",
+        "action": "Changer de direction dans le labyrinthe"
+      }
+    ],
+    "orientation": "any",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-10-10T00:00:00Z",
+    "link_status": "ok",
+    "link_checked_at": "2026-10-10T00:00:00Z",
+    "created_at": "2026-10-10T00:00:00Z",
+    "updated_at": "2026-10-10T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000045",
+    "slug": "geometry-neon-dash",
+    "title": "Geometry Neon Dash",
+    "tagline": "Saute en rythme par-dessus les pics, tremplins et portails de gravité.",
+    "description": "Un jeu de plateforme rythmique ultra-nerveux : enchaîne les sauts millimétrés au-dessus des triples pics, prends les tremplins jaunes et traverse les portails d'inversion de gravité jusqu'à 100 % du parcours.",
+    "instructions": "Appuie sur Espace, Flèche Haut ou clique/touche l'écran pour sauter (maintiens enfoncé pour enchaîner les sauts).",
+    "genre": [
+      "platformer",
+      "arcade"
+    ],
+    "cover_url": "/covers/geometry-neon-dash.jpg",
+    "banner_url": "/covers/geometry-neon-dash-banner.jpg",
+    "launch_mode": "external",
+    "launch_url": "https://scratch.mit.edu/projects/105500895/",
+    "source_url": "https://scratch.mit.edu/projects/105500895/",
+    "developer": "Euloge Arcade Studio",
+    "license_status": "link_only",
+    "license_notes": "Jouable nativement dans la Console Holo-Cartouche intégrée d'Euloge Arcade ou via le lien externe.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": true,
+      "gamepad": false,
+      "touch": true,
+      "verified": false
+    },
+    "controls": [
+      {
+        "device": "keyboard",
+        "input": "Espace / Flèche Haut",
+        "action": "Sauter par-dessus les obstacles"
+      }
+    ],
+    "orientation": "landscape",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-10-10T00:00:00Z",
+    "link_status": "ok",
+    "link_checked_at": "2026-10-10T00:00:00Z",
+    "created_at": "2026-10-10T00:00:00Z",
+    "updated_at": "2026-10-10T00:00:00Z"
   }
 ]

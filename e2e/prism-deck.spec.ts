@@ -74,7 +74,14 @@ test('Catalog Deck View and Profile Holographic Passport work and pass accessibi
   await visit(page, '/profil');
   await expect(page.getByText(/PASSEPORT HOLOGRAPHIQUE/)).toBeVisible();
   await expect(page.getByRole('heading', {name: /ADN de Joueur/})).toBeVisible();
+  const cosmeticsRegion = page.getByRole('region', {name: /Dos de Cartes Holographiques/});
+  await expect(cosmeticsRegion).toBeVisible();
   await expect(page.getByRole('heading', {name: /Paramètres & Studio d'Atmosphère/})).toBeVisible();
+
+  // Equip Obsidian Pulse card back in Prestige Cosmetics
+  const obsidianBtn = cosmeticsRegion.getByRole('button', {name: /Obsidian Pulse/});
+  await obsidianBtn.click();
+  await expect(obsidianBtn).toHaveAttribute('aria-pressed', 'true');
 
   // Switch to Terminal Phosphore skin from Profile Studio
   await page.getByRole('button', {name: /Terminal Phosphore/}).click();
@@ -105,5 +112,21 @@ test('External catalog games (2048, Krunker) launch and play in-platform via Hol
   await expect(frame2048).toHaveCount(1);
   await expect(frame2048).toHaveAttribute('src', /\/games\/arcade-suite\/index\.html\?slug=2048/);
   await expect(page.frameLocator('iframe[title="2048 — jeu"]').locator('#game-canvas')).toBeVisible();
+
+  // 3. New REA-engineered games (8-Ball Pool, Pac-Man Neon, Geometry Neon Dash) launch natively
+  await visit(page, '/jeux/8-ball-pool?jouer=1');
+  const poolFrame = page.frameLocator('iframe[title="Billard Cyber 8-Ball — jeu"]');
+  await expect(poolFrame.locator('#game-canvas')).toBeVisible();
+  await expect(poolFrame.locator('#hud-mode')).toHaveText('BILLARD // 8-BALL');
+
+  await visit(page, '/jeux/pac-man-neon?jouer=1');
+  const pacFrame = page.frameLocator('iframe[title="Pac-Man Neon — jeu"]');
+  await expect(pacFrame.locator('#game-canvas')).toBeVisible();
+  await expect(pacFrame.locator('#hud-mode')).toHaveText('ARCADE // LABYRINTHE');
+
+  await visit(page, '/jeux/geometry-neon-dash?jouer=1');
+  const dashFrame = page.frameLocator('iframe[title="Geometry Neon Dash — jeu"]');
+  await expect(dashFrame.locator('#game-canvas')).toBeVisible();
+  await expect(dashFrame.locator('#hud-mode')).toHaveText('RYTHME // NÉON DASH');
 });
 

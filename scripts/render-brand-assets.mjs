@@ -233,6 +233,9 @@ const EXTERNAL = {
   'loups-de-minuit': ['Entre amis · rôles', 'Loups de Minuit', C.violet, 'wolf'],
   'chroma-clash': ['Entre amis · cartes', 'Chroma Clash', C.cyan, 'cards'],
   'micro-neon': ['Entre amis · karaoké', 'Micro Néon', C.pink, 'mic'],
+  '8-ball-pool': ['Billard · précision', 'Billard Cyber 8-Ball', C.cyan, 'ball'],
+  'pac-man-neon': ['Arcade · labyrinthe', 'Pac-Man Neon', C.amber, 'rings'],
+  'geometry-neon-dash': ['Rythme · plateformes', 'Geometry Neon Dash', C.violet, 'cube'],
 };
 
 function motifArt(w, h, [kicker, title, accent, motif]) {
