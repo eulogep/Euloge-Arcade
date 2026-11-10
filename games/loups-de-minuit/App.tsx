@@ -35,11 +35,11 @@ type Phase =
 
 const DAY_DURATIONS = [120, 180, 300];
 
-function formatClock(s: number) {
+export function formatClock(s: number) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-function Stepper({label, value, min, max, onChange}: {label: string; value: number; min: number; max: number; onChange: (v: number) => void}) {
+export function Stepper({label, value, min, max, onChange}: {label: string; value: number; min: number; max: number; onChange: (v: number) => void}) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface2/50 px-3 py-2">
       <span className="font-semibold">{label}</span>
@@ -56,7 +56,7 @@ function Stepper({label, value, min, max, onChange}: {label: string; value: numb
   );
 }
 
-function PickList({players, indices, selected, onPick}: {players: Player[]; indices: number[]; selected: number | null; onPick: (i: number) => void}) {
+export function PickList({players, indices, selected, onPick}: {players: Player[]; indices: number[]; selected: number | null; onPick: (i: number) => void}) {
   return (
     <ul className="grid gap-2 sm:grid-cols-2">
       {indices.map((i) => (
@@ -74,7 +74,8 @@ function PickList({players, indices, selected, onPick}: {players: Player[]; indi
   );
 }
 
-export default function App() {
+/** Same-device game: one phone passed around the table. */
+export function LocalGame({onExit}: {onExit: () => void}) {
   const [names, setNames] = useState<string[]>([]);
   const [namesError, setNamesError] = useState<string | null>(null);
   const [counts, setCounts] = useState<RoleCounts>(defaultRoleCounts(MIN_PLAYERS));
@@ -158,7 +159,7 @@ export default function App() {
   // ---------------------------------------------------------------------------
   if (phase.k === 'setup') {
     return (
-      <Shell title="Loups de Minuit" kicker="Jeu de rôles · même appareil">
+      <Shell title="Loups de Minuit" kicker="Jeu de rôles · même appareil" onBack={onExit} backLabel="Changer de mode">
         <section className="panel p-5">
           <h2 className="mb-1 text-xl font-bold">Les joueurs</h2>
           <p className="mb-4 text-sm text-muted">Asseyez-vous en cercle : l’appareil passera de main en main dans cet ordre.</p>

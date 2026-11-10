@@ -20,6 +20,9 @@ import {getCartridgeCode} from '@/lib/prestige';
 import {loadLeaderboard, type LeaderboardRow} from '@/services/catalogService';
 import type {Game, LicenseStatus} from '@/types/game';
 
+/** Hosted games with online rooms (games/_party/online.ts). */
+const ONLINE_ROOM_GAMES = new Set(['loups-de-minuit']);
+
 const LICENSE_LABELS: Record<LicenseStatus, string> = {
   owned: 'Création originale Euloge Arcade',
   open_source: 'Logiciel libre (licence open source)',
@@ -152,6 +155,9 @@ export default function GameDetailsPage() {
   const cartridgeCode = getCartridgeCode(game);
   const hasDailyChallenge = game.supportsScores && DAILY_CHALLENGE_GAMES.has(game.slug);
   const challengeLaunch = hasDailyChallenge && params.get('defi') === '1';
+  // Invitation links to an online room: /jeux/<slug>?jouer=1&salon=CODE
+  const salon = ONLINE_ROOM_GAMES.has(game.slug) ? params.get('salon')?.toUpperCase() ?? '' : '';
+  const launchQuery = challengeLaunch ? 'challenge=daily' : /^[A-HJ-NP-Z2-9]{6}$/.test(salon) ? `salon=${salon}` : undefined;
 
   return (
     <div>
@@ -189,7 +195,7 @@ export default function GameDetailsPage() {
         </div>
 
         <div id="lecteur" className="mt-8 scroll-mt-20">
-          <GamePlayer game={game} autoStart={autoStart} launchQuery={challengeLaunch ? 'challenge=daily' : undefined} />
+          <GamePlayer game={game} autoStart={autoStart} launchQuery={launchQuery} />
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">

@@ -14,7 +14,7 @@ Découvre, lance, rejoue. Sans installation, sans publicité, sans faux compteur
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-2F7BFF?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0B0F24)
 ![Supabase](https://img.shields.io/badge/Supabase-RLS-A24DFF?style=for-the-badge&logo=supabase&logoColor=white&labelColor=0B0F24)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38E1FF?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=0B0F24)
-![Tests](https://img.shields.io/badge/tests-180-34D399?style=for-the-badge&labelColor=0B0F24)
+![Tests](https://img.shields.io/badge/tests-217-34D399?style=for-the-badge&labelColor=0B0F24)
 
 **Created by Euloge**
 
@@ -81,7 +81,7 @@ Trois jeux originaux pour jouer à plusieurs dans la même pièce, sur un télé
 - **Chroma Clash** (2 à 8 joueurs, humains ou bots) : jeu de cartes original de la famille des jeux de défausse, avec combos de chiffres identiques et pénalités cumulables. Un écran de passage cache la main de chacun.
 - **Micro Néon** (1 à 12 chanteurs) : karaoké noté au micro. La justesse est mesurée en direct sur l'appareil, sans enregistrement ; chansons du domaine public et import de tes propres chansons (.lrc + audio) en mode libre.
 
-Les salons en ligne (chacun sur son appareil, à distance) sont la prochaine étape.
+**Loups de Minuit se joue aussi en ligne** : chacun sur son appareil, même à distance, avec un code de salon à 6 caractères ou un lien d'invitation, sans compte. Le serveur arbitre la partie et le rôle de chacun n'est jamais envoyé aux autres appareils.
 
 ### System Breach
 
@@ -114,8 +114,8 @@ Détails et décisions : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 | | Résultat |
 | --- | --- |
 | Tests unitaires | **104** · recherche, filtres, tri, recommandations, succès, liste blanche, validation, import, défi du jour, règles des jeux entre amis, détection de la voix |
-| Tests de sécurité base de données | **38** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur, défi du jour |
-| Tests end-to-end | **38** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
+| Tests de sécurité base de données | **73** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur, défi du jour, salons en ligne (secret des rôles, actions interdites, partie complète) |
+| Tests end-to-end | **40** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
 | Layout shift (4G lente, CPU ×4) | **0,002** |
 | Accueil en 4G lente | **1,6 s** (affichage du plus gros élément) |
 | Dépendances de production | **0 vulnérabilité connue** |
@@ -132,7 +132,7 @@ Sans configuration, la plateforme tourne en **mode local** : catalogue embarqué
 **Avec comptes, admin et classements** (Docker et la [CLI Supabase](https://supabase.com/docs/guides/cli) requis) :
 
 ```bash
-supabase start -x realtime,studio,imgproxy,vector,logflare,supavisor
+supabase start -x studio,imgproxy,vector,logflare,supavisor   # Realtime inclus : salons en ligne
 cp .env.example .env.local     # renseigner l'URL et la clé ANON affichées
 npm run dev
 ```
