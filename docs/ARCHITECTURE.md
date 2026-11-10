@@ -83,6 +83,7 @@ Données brutes (`*.seed.json`) → validées (`gameSchema` côté client, trigg
   - les jeux tiers intégrés sont sandboxés (scripts, popups vers l'éditeur, pas de navigation du parent) ;
   - les jeux hébergés sont du code **interne versionné dans le dépôt**. Ils ont `allow-same-origin`, ce qui est nécessaire pour l'audio et la détection de fichier manquant, et jamais de code téléversé.
 - **Téléversements** : buckets limités à PNG, JPEG, WebP et AVIF (SVG refusé, risque XSS), 2 Mo pour les couvertures et 1 Mo pour les avatars. Les avatars sont rangés dans un dossier `uid/` propre à chaque utilisateur. **Aucun téléversement de code exécutable** n'est possible.
+- **Succès** : un joueur ne peut pas écrire dans `user_achievements`. Le client les réclame via la fonction `claim_achievements(ids)`, qui revérifie chaque condition à partir des lignes du joueur (`play_events`, `favorites`, `scores`) et n'accorde que celles qui sont remplies. Les conditions SQL (`achievement_condition_met`) doivent rester alignées sur `ACHIEVEMENT_RULES` (`src/features/achievements/evaluate.ts`) : un test unitaire le vérifie. Les succès liés aux scores restent aussi fiables que les scores, qui sont envoyés par le client.
 - **Pont de scores** : un message n'est accepté que s'il vient de notre origine, de l'iframe exacte du jeu, et pour un jeu `supports_scores`.
 - **check-links** : réservé aux admins. Il ne contacte que des URL https publiques (IP et localhost refusés).
 - **En-têtes** : `public/_headers` impose une CSP sans script inline, `nosniff`, une `Permissions-Policy` et `frame-ancestors 'self'`. Le test `e2e/csp.spec.ts` vérifie le build de production sous cette CSP.
@@ -123,6 +124,6 @@ Mesures sur le build de production (`vite preview`), Chromium 1366×768, via `Pe
 
 | Niveau | Outil | Couverture |
 | --- | --- | --- |
-| Unitaires | Vitest (36) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
-| Base de données | pgTAP (22) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, liste blanche, droits d'hébergement, publication non vérifiée |
-| End-to-end | Playwright (24) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |
+| Unitaires | Vitest (65) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
+| Base de données | pgTAP (30) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
+| End-to-end | Playwright (32) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |

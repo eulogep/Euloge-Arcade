@@ -14,7 +14,7 @@ Découvre, lance, rejoue. Sans installation, sans publicité, sans faux compteur
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-2F7BFF?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0B0F24)
 ![Supabase](https://img.shields.io/badge/Supabase-RLS-A24DFF?style=for-the-badge&logo=supabase&logoColor=white&labelColor=0B0F24)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38E1FF?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=0B0F24)
-![Tests](https://img.shields.io/badge/tests-82_passants-34D399?style=for-the-badge&labelColor=0B0F24)
+![Tests](https://img.shields.io/badge/tests-127-34D399?style=for-the-badge&labelColor=0B0F24)
 
 **Created by Euloge**
 
@@ -100,9 +100,9 @@ Détails et décisions : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 | | Résultat |
 | --- | --- |
-| Tests unitaires | **36** · recherche, filtres, tri, recommandations, succès, liste blanche, validation |
-| Tests de sécurité base de données | **22** · RLS, escalade de rôle, liste blanche, droits de publication |
-| Tests end-to-end | **24** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
+| Tests unitaires | **65** · recherche, filtres, tri, recommandations, succès, liste blanche, validation, import |
+| Tests de sécurité base de données | **30** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur |
+| Tests end-to-end | **32** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
 | Layout shift (4G lente, CPU ×4) | **0,002** |
 | Accueil en 4G lente | **1,6 s** (affichage du plus gros élément) |
 | Dépendances de production | **0 vulnérabilité connue** |

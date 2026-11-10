@@ -26,7 +26,8 @@ export interface UserDataStore {
   getRuns(): Promise<RunRecord[]>;
   submitRun(run: RunRecord): Promise<void>;
   getAchievements(): Promise<UnlockedAchievement[]>;
-  unlockAchievements(ids: string[]): Promise<void>;
+  /** Unlocks the given achievements and resolves with the ids the player now owns. */
+  unlockAchievements(ids: string[]): Promise<string[]>;
 }
 
 const MAX_LOCAL_HISTORY = 100;
@@ -80,6 +81,7 @@ export class LocalUserDataStore implements UserDataStore {
     const now = new Date().toISOString();
     for (const id of ids) if (!owned.has(id)) current.push({id, unlockedAt: now});
     writeJson(STORAGE_KEYS.achievements, current);
+    return ids;
   }
 
   /** Remove everything (after it has been merged into an account). */
@@ -96,6 +98,20 @@ export class RemoteUserDataStore implements UserDataStore {
   /** Maps game id -> slug, needed to rebuild RunRecords from the scores table. */
   constructor(private readonly slugById: Map<string, string>) {}
 
+  /**
+   * Writes still in flight. The server re-checks achievement conditions against
+   * stored rows, so a claim must wait until the favorite, launch or score that
+   * earned it has been written.
+   */
+  private readonly pendingWrites = new Set<Promise<unknown>>();
+
+  private track<T>(write: Promise<T>): Promise<T> {
+    this.pendingWrites.add(write);
+    const done = () => this.pendingWrites.delete(write);
+    write.then(done, done);
+    return write;
+  }
+
   async getFavorites() {
     const sb = await getSupabase();
     const {data, error} = await sb.from('favorites').select('game_id').order('created_at', {ascending: false});
@@ -103,7 +119,11 @@ export class RemoteUserDataStore implements UserDataStore {
     return data.map((r) => r.game_id as string);
   }
 
-  async setFavorite(gameId: string, on: boolean) {
+  setFavorite(gameId: string, on: boolean) {
+    return this.track(this.writeFavorite(gameId, on));
+  }
+
+  private async writeFavorite(gameId: string, on: boolean) {
     const sb = await getSupabase();
     const {error} = on
       ? await sb.from('favorites').upsert({game_id: gameId}, {onConflict: 'user_id,game_id', ignoreDuplicates: true})
@@ -122,7 +142,11 @@ export class RemoteUserDataStore implements UserDataStore {
     return data.map((r) => ({gameId: r.game_id as string, playedAt: r.created_at as string}));
   }
 
-  async recordLaunch(gameId: string) {
+  recordLaunch(gameId: string) {
+    return this.track(this.writeLaunch(gameId));
+  }
+
+  private async writeLaunch(gameId: string) {
     const sb = await getSupabase();
     const {error} = await sb.from('play_events').insert({game_id: gameId});
     if (error) throw error;
@@ -159,7 +183,11 @@ export class RemoteUserDataStore implements UserDataStore {
     });
   }
 
-  async submitRun(run: RunRecord) {
+  submitRun(run: RunRecord) {
+    return this.track(this.writeRun(run));
+  }
+
+  private async writeRun(run: RunRecord) {
     const sb = await getSupabase();
     const {error} = await sb.from('scores').insert({
       game_id: run.gameId,
@@ -177,13 +205,14 @@ export class RemoteUserDataStore implements UserDataStore {
     return data.map((r) => ({id: r.achievement_id as string, unlockedAt: r.unlocked_at as string}));
   }
 
+  /** The server grants only the achievements whose condition it can verify. */
   async unlockAchievements(ids: string[]) {
-    if (ids.length === 0) return;
+    if (ids.length === 0) return [];
+    await Promise.allSettled([...this.pendingWrites]);
     const sb = await getSupabase();
-    const {error} = await sb
-      .from('user_achievements')
-      .upsert(ids.map((id) => ({achievement_id: id})), {onConflict: 'user_id,achievement_id', ignoreDuplicates: true});
+    const {data, error} = await sb.rpc('claim_achievements', {p_ids: ids});
     if (error) throw error;
+    return (data ?? []) as string[];
   }
 }
 
@@ -205,7 +234,8 @@ export async function mergeLocalIntoRemote(local: LocalUserDataStore, remote: Re
   // Only the most recent launches are worth carrying over.
   for (const h of history.slice(0, 20).reverse()) if (knownGameIds.has(h.gameId)) tasks.push(remote.recordLaunch(h.gameId));
   for (const r of runs.slice(0, 20)) if (knownGameIds.has(r.gameId)) tasks.push(remote.submitRun(r));
-  tasks.push(remote.unlockAchievements(achievements.map((a) => a.id)));
   await Promise.allSettled(tasks);
+  // Claimed last: the server only grants what the merged data proves.
+  await remote.unlockAchievements(achievements.map((a) => a.id)).catch(() => []);
   local.clearAll();
 }

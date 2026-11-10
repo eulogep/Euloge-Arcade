@@ -1,7 +1,7 @@
 -- Server-side authorization & validation tests. Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(30);
 
 -- Fixtures: one admin, one player ------------------------------------------
 insert into auth.users (id, email, raw_user_meta_data, aud, role)
@@ -23,6 +23,9 @@ select throws_ok(
     values ('hack', 'Hack', 'xxxxxxxxxxxx', array['arcade'], 'external', 'https://example.com', 'link_only')$$,
   '42501', null, 'anon cannot insert games');
 select ok((select count(*) from public.game_popularity(30)) >= 0, 'anon can read aggregated popularity');
+select throws_ok(
+  $$select public.claim_achievements(array['first-launch'])$$,
+  '42501', null, 'anon cannot claim achievements');
 reset role;
 
 -- Player --------------------------------------------------------------------
@@ -61,6 +64,30 @@ select throws_ok(
 select throws_ok(
   $$insert into public.embed_domains (domain) values ('evil.example')$$,
   '42501', null, 'player cannot extend the embed allowlist');
+
+-- Achievements are granted by the server only (claim_achievements re-checks conditions)
+select throws_ok(
+  $$insert into public.user_achievements (achievement_id) values ('system-breach-flawless')$$,
+  '42501', null, 'player cannot insert achievements directly');
+select is(
+  array(select public.claim_achievements(array['first-launch'])),
+  array['first-launch'], 'an achievement whose condition holds is granted');
+select is(
+  (select count(*)::int from public.claim_achievements(array['curator'])),
+  0, 'curator is refused with a single favorite');
+select is(
+  (select count(*)::int from public.claim_achievements(array['system-breach-5k'])),
+  0, 'score achievement is refused below the threshold');
+insert into public.scores (game_id, score) select id, 5200 from public.games where slug = 'system-breach';
+select is(
+  array(select public.claim_achievements(array['system-breach-5k'])),
+  array['system-breach-5k'], 'score achievement is granted once a qualifying score exists');
+select is(
+  (select count(*)::int from public.claim_achievements(array['not-an-achievement', 'system-breach-clear'])),
+  0, 'unknown ids and unmet conditions grant nothing');
+select is(
+  (select count(*)::int from public.user_achievements),
+  2, 'player owns exactly the achievements they earned');
 reset role;
 
 -- Admin ---------------------------------------------------------------------

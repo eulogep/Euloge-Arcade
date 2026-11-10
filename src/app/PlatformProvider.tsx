@@ -276,11 +276,14 @@ export function PlatformProvider({children}: {children: ReactNode}) {
     evaluatingRef.current = true;
     store
       .unlockAchievements(earned)
-      .then(() => {
+      .then((owned) => {
+        // Only what the store confirmed: the server may refuse an unverifiable claim.
+        const granted = earned.filter((id) => owned.includes(id));
+        if (granted.length === 0) return;
         const now = new Date().toISOString();
-        setUnlocked((u) => [...u, ...earned.map((id) => ({id, unlockedAt: now}))]);
+        setUnlocked((u) => [...u, ...granted.map((id) => ({id, unlockedAt: now}))]);
         playAchievementFanfare();
-        for (const id of earned) {
+        for (const id of granted) {
           notify({tone: 'achievement', title: 'Succès débloqué', body: achievementTitles.get(id)});
         }
       })
