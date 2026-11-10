@@ -14,7 +14,7 @@ Découvre, lance, rejoue. Sans installation, sans publicité, sans faux compteur
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-2F7BFF?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0B0F24)
 ![Supabase](https://img.shields.io/badge/Supabase-RLS-A24DFF?style=for-the-badge&logo=supabase&logoColor=white&labelColor=0B0F24)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38E1FF?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=0B0F24)
-![Tests](https://img.shields.io/badge/tests-145-34D399?style=for-the-badge&labelColor=0B0F24)
+![Tests](https://img.shields.io/badge/tests-180-34D399?style=for-the-badge&labelColor=0B0F24)
 
 **Created by Euloge**
 
@@ -64,6 +64,7 @@ La plupart des portails de jeux en ligne sont des listes de liens noyées sous l
 | Jeu | Mode | Droits |
 | --- | --- | --- |
 | **System Breach** | 🟢 Hébergé | Création originale d'Euloge |
+| **Loups de Minuit**, **Chroma Clash**, **Micro Néon** | 🟢 Hébergés · entre amis | Créations originales d'Euloge (chansons intégrées : domaine public) |
 | **Puzzle d'échecs du jour** | 🔵 Intégré | Widget officiel proposé par Lichess |
 | **Krunker.io**, **2048**, **Lichess** | ↗️ Site officiel | Liens uniquement : ces sites refusent l'intégration |
 | **Tetris**, **Celeste Classic**, **Wordle**, **Line Rider**, **A Dark Room**, **Little Alchemy 2**, **slither.io**, **diep.io**, **skribbl.io**, **Shell Shockers**, **Hextris** | ↗️ Site officiel | Liens uniquement, vers la page officielle de chaque jeu |
@@ -71,6 +72,16 @@ La plupart des portails de jeux en ligne sont des listes de liens noyées sous l
 | **21 projets de la liste @RadiantOpti** | ↗️ Projets externes | Quake, Halo, Zombies, Skate, PES, GTA et autres ; liens incertains conservés mais signalés indisponibles |
 
 Chaque jeu tiers a une **illustration originale** de la plateforme, générée par `scripts/render-brand-assets.mjs`. Aucun logo ni visuel tiers n'est réutilisé, et ces jeux restent la propriété de leurs auteurs.
+
+### Entre amis, sur un seul appareil
+
+Trois jeux originaux pour jouer à plusieurs dans la même pièce, sur un téléphone, une tablette ou un ordinateur, sans compte :
+
+- **Loups de Minuit** (4 à 16 joueurs) : jeu de rôles et de bluff d'après le loup-garou traditionnel. L'appareil fait le tour de la table pour les rôles et les actions de nuit, qui restent secrets ; le jour, débat chronométré et vote.
+- **Chroma Clash** (2 à 8 joueurs, humains ou bots) : jeu de cartes original de la famille des jeux de défausse, avec combos de chiffres identiques et pénalités cumulables. Un écran de passage cache la main de chacun.
+- **Micro Néon** (1 à 12 chanteurs) : karaoké noté au micro. La justesse est mesurée en direct sur l'appareil, sans enregistrement ; chansons du domaine public et import de tes propres chansons (.lrc + audio) en mode libre.
+
+Les salons en ligne (chacun sur son appareil, à distance) sont la prochaine étape.
 
 ### System Breach
 
@@ -102,9 +113,9 @@ Détails et décisions : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 | | Résultat |
 | --- | --- |
-| Tests unitaires | **75** · recherche, filtres, tri, recommandations, succès, liste blanche, validation, import |
-| Tests de sécurité base de données | **37** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur, défi du jour |
-| Tests end-to-end | **33** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
+| Tests unitaires | **104** · recherche, filtres, tri, recommandations, succès, liste blanche, validation, import, défi du jour, règles des jeux entre amis, détection de la voix |
+| Tests de sécurité base de données | **38** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur, défi du jour |
+| Tests end-to-end | **38** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
 | Layout shift (4G lente, CPU ×4) | **0,002** |
 | Accueil en 4G lente | **1,6 s** (affichage du plus gros élément) |
 | Dépendances de production | **0 vulnérabilité connue** |
