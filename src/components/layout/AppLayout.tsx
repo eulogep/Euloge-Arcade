@@ -5,7 +5,7 @@ import {ReflexLabModal} from '@/components/gaming/ReflexLabModal';
 import {CommandPalette} from '@/components/layout/CommandPalette';
 import {Footer} from '@/components/layout/Footer';
 import {Header, MobileTabBar} from '@/components/layout/Header';
-import {HalloweenAtmosphere} from '@/components/layout/HalloweenAtmosphere';
+import {SeasonalAtmosphere} from '@/components/layout/SeasonalAtmosphere';
 import {IntroSplash} from '@/components/layout/IntroSplash';
 import {BrandLoader, Toaster} from '@/components/ui/feedback';
 import {cn} from '@/lib/cn';
@@ -26,7 +26,7 @@ export function AppLayout() {
   return (
     <>
       <IntroSplash />
-      <HalloweenAtmosphere />
+      <SeasonalAtmosphere />
       <ScrollToTop />
       <Header />
       <main id="contenu" className={cn('min-h-[100dvh] pb-20 md:pb-0', underHeader && '-mt-16')}>
