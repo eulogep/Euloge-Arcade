@@ -242,8 +242,7 @@ export function GamePlayer({game, autoStart = false}: {game: Game; autoStart?: b
                 <button
                   type="button"
                   onClick={() => start('native')}
-                  className="btn-primary h-12 px-6 text-base"
-                  aria-label={`Lancer ${game.title}`}>
+                  className="btn-primary h-12 px-6 text-base">
                   <Play size={18} className="fill-current" /> Jouer sur la plateforme (Console locale)
                 </button>
                 <Link to="/jeux" className="btn-secondary h-12 px-5">
@@ -262,8 +261,7 @@ export function GamePlayer({game, autoStart = false}: {game: Game; autoStart?: b
                 <button
                   type="button"
                   onClick={() => start('native')}
-                  className="btn-primary h-12 px-6 text-base"
-                  aria-label={`Lancer ${game.title}`}>
+                  className="btn-primary h-12 px-6 text-base">
                   <Play size={20} className="fill-current" /> Jouer sur la plateforme
                 </button>
                 <button
