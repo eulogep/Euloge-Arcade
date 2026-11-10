@@ -101,6 +101,20 @@ export async function loadLeaderboard(gameId: string): Promise<LeaderboardRow[] 
     method: 'POST',
     body: JSON.stringify({p_game_id: gameId, p_limit: 10}),
   });
+  return toLeaderboardRows(data);
+}
+
+/** Best score per player for one daily challenge (UTC day key). */
+export async function loadDailyLeaderboard(gameId: string, day: string): Promise<LeaderboardRow[] | null> {
+  if (!ENV.backendEnabled) return null;
+  const data = await publicRest<unknown[]>('rpc/daily_challenge_leaderboard', {
+    method: 'POST',
+    body: JSON.stringify({p_game_id: gameId, p_day: day, p_limit: 10}),
+  });
+  return toLeaderboardRows(data);
+}
+
+function toLeaderboardRows(data: unknown[]): LeaderboardRow[] {
   return (data as Array<{rank: number; display_name: string; score: number; achieved_at: string}>).map((r) => ({
     rank: Number(r.rank),
     displayName: r.display_name,
