@@ -21,7 +21,11 @@ Cible recommandée : **Cloudflare Pages** (site statique + `_headers`/`_redirect
    - Site URL : `https://ton-domaine` ;
    - Redirect URLs : `https://ton-domaine/**`.
 5. Activer la **confirmation par e-mail** et configurer un SMTP. L'interface gère déjà le cas « vérifie ta boîte mail ».
-6. Créer ton compte depuis le site, puis te donner le rôle administrateur (SQL Editor) :
+6. Pour les **salons en ligne** (Loups de Minuit, chacun sur son appareil) :
+   - **Authentication → Sign In / Providers** : activer **Allow anonymous sign-ins** (on rejoint avec un code et un prénom, sans compte). Garder le CAPTCHA ou la limite de connexions anonymes par IP proposée par Supabase ;
+   - **Realtime** : rien à faire, la migration ajoute `party_rooms` à la publication `supabase_realtime`.
+   Sans ces réglages, le reste du site fonctionne ; seul le mode « En ligne » affiche une erreur de connexion.
+7. Créer ton compte depuis le site, puis te donner le rôle administrateur (SQL Editor) :
    ```sql
    update public.profiles set role = 'admin'
    where id = (select id from auth.users where email = 'toi@exemple.com');

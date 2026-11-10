@@ -36,7 +36,8 @@ jobs:
           # setup-cli tries to resolve the moving "latest" release.
           version: 2.116.0
       - run: npm ci
-      - run: supabase start -x realtime,studio,imgproxy,vector,logflare,supavisor
+      # Realtime is needed by the online party rooms e2e test.
+      - run: supabase start -x studio,imgproxy,vector,logflare,supavisor
       - run: supabase test db
       - name: Local env for the app (public demo keys of the local stack)
         run: |

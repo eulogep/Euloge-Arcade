@@ -12,6 +12,7 @@ test('home shows the "Entre amis" rail with the three party games', async ({page
 test('Loups de Minuit: roles, a full night on one device, then the village vote', async ({page}) => {
   await visit(page, '/jeux/loups-de-minuit?jouer=1');
   const game = page.frameLocator('iframe[title="Loups de Minuit — jeu"]');
+  await game.getByRole('button', {name: /Sur cet appareil/}).click();
   await game.getByRole('button', {name: 'Distribuer les rôles'}).click();
 
   // Secret role reveal, passing the device around the 4 default players.
@@ -51,17 +52,19 @@ test('Chroma Clash: a human plays against a bot', async ({page}) => {
 
   const hand = game.getByRole('region', {name: 'Main de Joueur 1'});
   await expect(hand.getByRole('button')).toHaveCount(7);
-  // Play the first playable card if there is one, otherwise draw.
-  const playable = hand.locator('button:not([disabled])');
-  if ((await playable.count()) > 0) {
-    await playable.first().click();
-    const wildDialog = game.getByRole('dialog', {name: 'Choisis la couleur'});
+  // Play a number card if possible (actions such as Bond or Retour would replay the
+  // turn with two players); otherwise draw, and keep a playable drawn card.
+  const numberCards = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((v) => `button:not([disabled])[aria-label^="${v} "]`).join(', ');
+  const playableNumber = hand.locator(numberCards);
+  if ((await playableNumber.count()) > 0) {
+    await playableNumber.first().click();
     await game.getByRole('button', {name: /^Poser/}).click();
-    if (await wildDialog.isVisible()) await wildDialog.getByRole('button', {name: /Cyan/}).click();
     await expect(game.getByText(/^Joueur 1 joue/)).toBeVisible();
   } else {
     await game.getByRole('button', {name: /^Piocher/}).first().click();
     await expect(game.getByText(/^Joueur 1 pioche/)).toBeVisible();
+    const keep = game.getByRole('button', {name: 'Garder et passer'});
+    if (await keep.isVisible()) await keep.click();
   }
   // The bot answers on its own.
   await expect(game.getByText(/^Bot Ion (joue|pioche|ne peut|garde)/)).toBeVisible({timeout: 5000});

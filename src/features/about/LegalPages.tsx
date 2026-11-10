@@ -189,6 +189,19 @@ export function PrivacyPage() {
         </>
       )}
 
+      {backendEnabled && (
+        <>
+          <h2>Jeu en ligne (salons)</h2>
+          <ul>
+            <li><strong>Données :</strong> le prénom que tu choisis, ta présence dans le salon, ton rôle, tes actions de nuit et tes votes, rattachés à un identifiant de connexion anonyme créé sur ton appareil (aucun e-mail).</li>
+            <li><strong>Finalité :</strong> faire fonctionner la partie. Ton rôle et tes actions ne sont jamais envoyés aux autres joueurs : chaque appareil ne reçoit que ce que son joueur a le droit de savoir. Les rôles sont révélés à tous en fin de partie.</li>
+            <li><strong>Durée :</strong> les salons inactifs depuis plus de 24 heures sont supprimés avec toutes leurs données lors du nettoyage automatique, effectué à chaque création de salon. Quitter un salon avant le début de la partie t'en retire immédiatement.</li>
+            <li><strong>Session :</strong> un jeton de connexion anonyme est conservé dans ton navigateur (localStorage), séparé de ton éventuel compte.</li>
+            <li><strong>Sous-traitant :</strong> Supabase (base de données, authentification anonyme, temps réel).</li>
+          </ul>
+        </>
+      )}
+
       <h2>Recommandations</h2>
       <p>
         Désactivées par défaut. Si tu les actives, les suggestions sont calculées <strong>sur ton appareil</strong> à partir des genres de tes
