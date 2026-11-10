@@ -39,7 +39,7 @@ test('production build works under the Content-Security-Policy', async ({page}) 
   await expect(page.frameLocator('iframe[title="System Breach — jeu"]').getByRole('button', {name: /INITIATE STORY BREACH/})).toBeVisible({timeout: 20000});
   // Party games (separate bundles, fonts and styles) under the same policy.
   for (const [slug, title, start] of [
-    ['loups-de-minuit', 'Loups de Minuit', 'Distribuer les rôles'],
+    ['loups-de-minuit', 'Loups de Minuit', 'Sur cet appareil'],
     ['chroma-clash', 'Chroma Clash', 'Distribuer les cartes'],
     ['micro-neon', 'Micro Néon', 'Commencer la soirée'],
   ]) {

@@ -98,6 +98,14 @@ Données brutes (`*.seed.json`) → validées (`gameSchema` côté client, trigg
 - **Micro** : `Permissions-Policy: microphone=(self)` et l'iframe reçoit `allow="microphone"` uniquement pour `micro-neon` (`MICROPHONE_GAMES` dans `GamePlayer`). Le son est analysé en mémoire (autocorrélation normalisée), jamais enregistré ni envoyé. Pendant la notation, seul un métronome en bruit filtré joue, pour que le micro n'entende que la voix. `media-src blob:` sert à lire l'audio importé localement.
 - **Genre** `party` (« Entre amis ») : ajouté au type, à la validation zod et au trigger `validate_game` (migration `20261110180000_party_games.sql`, qui insère aussi les trois jeux).
 
+## Salons en ligne (Loups de Minuit)
+
+- **Serveur arbitre** (migration `20261110200000_party_rooms.sql`) : l'état complet vit dans `party_rooms`, `party_members`, `party_secrets`, `party_night_actions` et `party_votes`. Aucune de ces tables n'est lisible ni modifiable directement, sauf la ligne du salon pour ses membres (nécessaire à Realtime). Chaque coup passe par une fonction `SECURITY DEFINER` (`party_create_room`, `party_join_room`, `party_start`, `party_night_action`, `party_vote`, `party_advance`, `party_leave_room`) qui vérifie la phase, le rôle et la cible. La nuit et le vote se résolvent dès que toutes les actions attendues sont arrivées ; l'hôte peut forcer la suite si un joueur ne répond plus.
+- **Secret** : `party_state(room)` renvoie la vue de l'appelant uniquement (son rôle, sa meute s'il est loup, ses visions s'il est voyante). Les rôles des autres ne quittent jamais la base avant la fin de partie, pas même vers l'hôte.
+- **Synchro** : chaque changement incrémente `party_rooms.version`. Les clients s'abonnent à cette ligne via Realtime (`postgres_changes`, filtré par RLS) et relisent `party_state`, avec une relecture de secours toutes les 4 s si Realtime est coupé (20 s sinon). Les minuteurs sont des horodatages serveur ; à l'échéance, n'importe quel appareil appelle `party_advance`, que le serveur revérifie.
+- **Identité** : connexion anonyme Supabase, stockée sous sa propre clé (`euloge-arcade-party-auth`) pour ne jamais se mélanger avec le compte de la plateforme. supabase-js n'est chargé qu'à l'ouverture du mode en ligne (`games/_party/online.ts`).
+- **Nettoyage** : les salons inactifs depuis 24 h sont supprimés à chaque création de salon ; un hôte ne peut pas avoir plus de trois salons ouverts.
+
 ## Ajouter un jeu
 
 - **Hébergé (A)** :
@@ -134,5 +142,5 @@ Mesures sur le build de production (`vite preview`), Chromium 1366×768, via `Pe
 | Niveau | Outil | Couverture |
 | --- | --- | --- |
 | Unitaires | Vitest (104) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
-| Base de données | pgTAP (38) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
-| End-to-end | Playwright (38) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |
+| Base de données | pgTAP (73) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
+| End-to-end | Playwright (40) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |
