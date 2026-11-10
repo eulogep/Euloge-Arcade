@@ -1,7 +1,7 @@
 -- Server-side authorization & validation tests. Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(37);
+select plan(38);
 
 -- Fixtures: one admin, one player ------------------------------------------
 insert into auth.users (id, email, raw_user_meta_data, aud, role)
@@ -18,6 +18,9 @@ select is(
 set local role anon;
 select ok((select count(*) from public.games) > 0, 'anon can read published games');
 select is((select count(*)::int from public.games where status <> 'published'), 0, 'anon never sees drafts');
+select is(
+  (select count(*)::int from public.games where 'party' = any (genre) and launch_mode = 'hosted'),
+  3, 'the three hosted party games are published with the party genre');
 select throws_ok(
   $$insert into public.games (slug, title, description, genre, launch_mode, launch_url, license_status)
     values ('hack', 'Hack', 'xxxxxxxxxxxx', array['arcade'], 'external', 'https://example.com', 'link_only')$$,

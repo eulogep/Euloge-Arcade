@@ -34,6 +34,8 @@ const SANDBOX_HOSTED = 'allow-scripts allow-same-origin allow-pointer-lock allow
 /** Third-party embeds keep their own origin; popups only to open the provider's site. */
 const SANDBOX_EMBED = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-pointer-lock';
 const LOAD_TIMEOUT_MS = 20_000;
+/** First-party hosted games that may ask for the microphone (karaoke pitch scoring). */
+const MICROPHONE_GAMES = new Set(['micro-neon']);
 const HOSTED_MARKER = 'meta[name="euloge-arcade-game"]';
 
 type PlayerState =
@@ -354,7 +356,7 @@ export function GamePlayer({
               title={`${game.title} — jeu`}
               className={cn('absolute inset-0 h-full w-full border-0 transition-opacity duration-500', state.phase === 'ready' ? 'opacity-100' : 'opacity-0')}
               sandbox={isRunningFirstParty ? SANDBOX_HOSTED : SANDBOX_EMBED}
-              allow="fullscreen; gamepad; autoplay"
+              allow={`fullscreen; gamepad; autoplay${decision.kind === 'hosted' && MICROPHONE_GAMES.has(game.slug) ? '; microphone' : ''}`}
               referrerPolicy="strict-origin-when-cross-origin"
               loading="eager"
               onLoad={onIframeLoad}

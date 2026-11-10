@@ -43,6 +43,9 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         'system-breach': resolve(__dirname, 'games/system-breach/index.html'),
+        'loups-de-minuit': resolve(__dirname, 'games/loups-de-minuit/index.html'),
+        'chroma-clash': resolve(__dirname, 'games/chroma-clash/index.html'),
+        'micro-neon': resolve(__dirname, 'games/micro-neon/index.html'),
       },
     },
   },
@@ -50,6 +53,6 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'games/**/*.test.ts'],
   },
 });

@@ -39,6 +39,7 @@ export const GENRES = [
   'retro',
   'racing',
   'sports',
+  'party',
 ] as const;
 export type Genre = (typeof GENRES)[number];
 

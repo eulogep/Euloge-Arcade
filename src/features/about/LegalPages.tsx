@@ -127,7 +127,8 @@ export function PrivacyPage() {
       <h2>Données conservées sur ton appareil</h2>
       <ul>
         <li>
-          <strong>Données :</strong> favoris, historique de lancement, scores, succès et préférences (thème, animations et recommandations).
+          <strong>Données :</strong> favoris, historique de lancement, scores, succès et préférences (thème, animations et recommandations),
+          ainsi que les prénoms saisis pour les jeux entre amis.
         </li>
         <li>
           <strong>Finalité :</strong> mémoriser tes choix et personnaliser l'interface sur l'appareil utilisé.
@@ -140,6 +141,13 @@ export function PrivacyPage() {
           <strong>Durée :</strong> jusqu'à leur suppression depuis le profil ou les réglages de ton navigateur.
         </li>
       </ul>
+
+      <h2>Micro (karaoké Micro Néon)</h2>
+      <p>
+        Le karaoké Micro Néon peut utiliser ton micro, seulement si tu l'autorises, pour mesurer la justesse de ta voix. Le son est analysé en
+        direct sur ton appareil : il n'est ni enregistré, ni conservé, ni transmis à {BRAND.name} ou à qui que ce soit. Le micro se coupe dès que
+        tu quittes le jeu ou que tu touches « Micro actif ». Les chansons que tu importes (paroles et audio) restent elles aussi sur ton appareil.
+      </p>
 
       <h2>Traceurs</h2>
       <p>

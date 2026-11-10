@@ -1,0 +1,70 @@
+@config "./tailwind.config.js";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+    background:
+      radial-gradient(60rem 36rem at 10% -10%, rgb(47 123 255 / 0.18), transparent 60%),
+      radial-gradient(50rem 32rem at 100% 0%, rgb(162 77 255 / 0.16), transparent 62%),
+      #070914;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+  :focus-visible {
+    outline: 2px solid #38e1ff;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl px-5 font-semibold transition
+      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply btn text-white;
+    background: linear-gradient(135deg, #38e1ff 0%, #2f7bff 45%, #a24dff 100%);
+    box-shadow: 0 10px 34px -12px rgb(47 123 255 / 0.7);
+  }
+  .btn-secondary {
+    @apply btn border border-line bg-surface2/80 text-ink hover:bg-surface2;
+  }
+  .btn-ghost {
+    @apply btn text-muted hover:bg-white/5 hover:text-ink;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white;
+  }
+  .panel {
+    @apply rounded-2xl border border-line bg-surface/85 backdrop-blur;
+  }
+  .tag {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-muted;
+  }
+  .input {
+    @apply min-h-[48px] w-full rounded-xl border border-line bg-surface2/70 px-3 text-base text-ink placeholder:text-muted/70
+      focus:border-cyan/60 focus:outline-none focus:ring-2 focus:ring-cyan/30;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

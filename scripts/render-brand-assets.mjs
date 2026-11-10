@@ -116,6 +116,17 @@ const MOTIFS = {
     <path d="M70 34l12-4-4 12" ${stroke(C.pink, 3)}/>`,
   ring: (a) => `<ellipse cx="50" cy="50" rx="44" ry="14" ${stroke(a, 5)} transform="rotate(-16 50 50)"/>
     <circle cx="50" cy="50" r="12" fill="${C.blue}" opacity=".5"/><circle cx="82" cy="20" r="3" fill="#fff"/><circle cx="16" cy="78" r="2" fill="#fff"/>`,
+  wolf: (a) => `<circle cx="62" cy="34" r="22" fill="${a}" opacity=".22"/><circle cx="62" cy="34" r="22" ${stroke(a)}/>
+    <path d="M10 92 L30 52 L38 66 L50 40 L62 66 L70 52 L90 92 Z" fill="#070914" ${stroke(C.violet, 2)}/>
+    <path d="M38 76 l6 -4 l2 6 z M56 72 l6 4 l-6 2 z" fill="${C.amber}"/>`,
+  cards: (a) => [-24, -8, 8, 24].map((deg, i) => {
+      const col = [C.cyan, C.pink, C.amber, C.green][i];
+      return `<g transform="rotate(${deg} 50 92)"><rect x="34" y="18" width="32" height="48" rx="5" fill="#0d1124" ${stroke(col, 2.5)}/>
+      <text x="50" y="50" text-anchor="middle" font-family="SG" font-weight="700" font-size="18" fill="${col}">${['7', '+2', '⇄', '◈'][i]}</text></g>`;
+    }).join(''),
+  mic: (a) => `<rect x="38" y="12" width="24" height="42" rx="12" fill="${a}" opacity=".25"/><rect x="38" y="12" width="24" height="42" rx="12" ${stroke(a, 3)}/>
+    <path d="M28 44a22 22 0 0 0 44 0M50 66v18M38 86h24" ${stroke(a, 3)}/>
+    <path d="M14 30q-6 14 0 28M84 30q6 14 0 28" ${stroke(C.pink, 2.5)}/><path d="M6 24q-10 20 0 40M92 24q10 20 0 40" ${stroke(C.violet, 2)} opacity=".7"/>`,
   skate: (a) => `<rect x="10" y="40" width="80" height="16" rx="8" ${stroke(a, 3)} transform="rotate(-14 50 48)"/>
     <circle cx="26" cy="68" r="6" ${stroke(C.pink)}/><circle cx="70" cy="57" r="6" ${stroke(C.pink)}/><path d="M8 88h84" ${stroke(C.violet, 2)} opacity=".5"/>`,
   flame: (a) => `<path d="M50 92c-20 0-30-14-26-32 4-14 16-20 14-40 14 10 20 22 18 34 4-4 6-10 6-16 10 10 14 22 12 32-2 14-10 22-24 22z" ${stroke(C.amber, 3)}/>
@@ -219,6 +230,9 @@ const EXTERNAL = {
   'shell-shockers': ['FPS multijoueur', 'Shell Shockers', C.amber, 'egg'],
   hextris: ['Puzzle', 'Hextris', C.violet, 'hex'],
   'budokai-tenkaichi-3-web-online': ['Combat 3D · projet non officiel', 'Budokai Tenkaichi 3', C.cyan, 'energy'],
+  'loups-de-minuit': ['Entre amis · rôles', 'Loups de Minuit', C.violet, 'wolf'],
+  'chroma-clash': ['Entre amis · cartes', 'Chroma Clash', C.cyan, 'cards'],
+  'micro-neon': ['Entre amis · karaoké', 'Micro Néon', C.pink, 'mic'],
 };
 
 function motifArt(w, h, [kicker, title, accent, motif]) {
@@ -250,6 +264,7 @@ const GENRE_ART = {
   retro: ['Rétro', C.amber, 'rings'],
   racing: ['Course', C.cyan, 'wave'],
   sports: ['Sport', C.green, 'ball'],
+  party: ['Entre amis', C.pink, 'cards'],
 };
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 for (const g of JSON.parse(readFileSync(resolve(root, 'src/data/games.seed.json'), 'utf8'))) {
@@ -302,12 +317,17 @@ async function shot(page, html, out, w, h, type = 'png') {
   console.log('✓', out);
 }
 
+// ONLY=slug-a,slug-b renders just those covers (no brand assets), leaving the others untouched.
+const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
 const browser = await chromium.launch();
 const page = await browser.newPage();
-await shot(page, iconPage(180), 'public/brand/apple-touch-icon.png', 180, 180);
-await shot(page, iconPage(512), 'public/brand/icon-512.png', 512, 512);
-await shot(page, ogImage, 'public/brand/og-image.png', 1200, 630);
+if (!only) {
+  await shot(page, iconPage(180), 'public/brand/apple-touch-icon.png', 180, 180);
+  await shot(page, iconPage(512), 'public/brand/icon-512.png', 512, 512);
+  await shot(page, ogImage, 'public/brand/og-image.png', 1200, 630);
+}
 for (const [slug, tpl] of Object.entries(covers)) {
+  if (only && !only.has(slug)) continue;
   // Card covers are displayed at ~330 CSS px: 800px wide covers 2x screens.
   await shot(page, base(800, 500, tpl(800, 500, false)), `public/covers/${slug}.jpg`, 800, 500, 'jpeg');
   await shot(page, base(1600, 683, tpl(1600, 683, true), '.txt{display:none}'), `public/covers/${slug}-banner.jpg`, 1600, 683, 'jpeg');

@@ -11,11 +11,11 @@ test('instant search from the header filters the catalog', async ({page}) => {
 test('genre and feature filters, sort and empty state', async ({page}) => {
   await visit(page, '/jeux');
   await expect(page.getByText(/\d+ jeux au catalogue/)).toBeVisible();
-  await page.getByRole('group', {name: 'Filtrer par genre'}).getByRole('button', {name: 'Arcade'}).click();
+  await page.getByRole('group', {name: 'Filtrer par genre'}).getByRole('button', {name: 'Plateforme'}).click();
   await expect(page.getByText(/\d+ jeux correspondants/)).toBeVisible();
   await page.getByRole('group', {name: 'Filtrer par caractéristique'}).getByRole('button', {name: 'Jouable sur la plateforme'}).click();
   await expect(page.getByText('1 jeu correspondant')).toBeVisible();
-  await expect(page).toHaveURL(/genre=arcade/);
+  await expect(page).toHaveURL(/genre=platformer/);
 
   // Shareable URL restores the same state
   await page.reload();
