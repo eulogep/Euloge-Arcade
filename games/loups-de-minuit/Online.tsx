@@ -179,11 +179,15 @@ export function OnlineGame({onExit}: {onExit: () => void}) {
         setState((prev) => (prev && prev.room.version > s.room.version ? prev : s));
       } while (dirty.current);
     } catch (e) {
-      // The room is gone or we are no longer a member: back to the entry screen.
-      setRoomId(null);
-      setState(null);
-      rememberRoom(GAME, null);
-      setError((e as Error).message);
+      const message = (e as Error).message;
+      if (/Salon introuvable/.test(message)) {
+        // The room is gone or we are no longer a member: back to the entry screen.
+        setRoomId(null);
+        setState(null);
+        rememberRoom(GAME, null);
+      }
+      // Anything else (network blip…) is transient: keep the room, the next poll retries.
+      setError(message);
     } finally {
       fetching.current = false;
     }
@@ -207,12 +211,19 @@ export function OnlineGame({onExit}: {onExit: () => void}) {
 
   const left = useCountdown(state?.room.phase_ends_at ?? null, offset);
   const advancedFor = useRef('');
+  const [retryTick, setRetryTick] = useState(0);
   // When a server timer runs out, any device may move the game on (the server re-checks).
   useEffect(() => {
     if (!roomId || left !== 0 || advancedFor.current === phaseKey) return;
     advancedFor.current = phaseKey;
-    void rpc('party_advance', {p_room: roomId}).catch(() => {});
-  }, [left, phaseKey, roomId]);
+    // If the server says "not yet" (clock drift) or the network fails, try again shortly.
+    void rpc('party_advance', {p_room: roomId}).catch(() => {
+      window.setTimeout(() => {
+        if (advancedFor.current === phaseKey) advancedFor.current = '';
+        setRetryTick((t) => t + 1);
+      }, 2000);
+    });
+  }, [left, phaseKey, roomId, retryTick]);
 
   async function act(fn: string, args: Record<string, unknown>) {
     setBusy(true);

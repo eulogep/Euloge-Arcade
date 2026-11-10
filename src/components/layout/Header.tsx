@@ -278,7 +278,7 @@ export function Avatar({url, name, size = 32}: {url: string | null; name: string
 
 export function Header() {
   const surprise = useSurprise();
-  const {favorites, setCommandPaletteOpen} = usePlatform();
+  const {favorites, setCommandPaletteOpen, catalog} = usePlatform();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -346,7 +346,13 @@ export function Header() {
           <Command size={16} className="text-accent-3" />
           <kbd className="rounded border px-1.5 py-0.5 font-mono text-[10px] text-ink-faint border-line-soft">⌘K</kbd>
         </button>
-        <button type="button" onClick={surprise} className="btn-ghost h-10 min-h-0 shrink-0 px-2.5" title="Surprends-moi : un jeu au hasard">
+        {/* Disabled until the catalog is loaded: a click would otherwise do nothing. */}
+        <button
+          type="button"
+          onClick={surprise}
+          disabled={catalog.status !== 'ready'}
+          className="btn-ghost h-10 min-h-0 shrink-0 px-2.5 disabled:opacity-50"
+          title="Surprends-moi : un jeu au hasard">
           <Dices size={18} className="text-accent-3" />
           <span className="hidden lg:inline">Surprends-moi</span>
           <span className="sr-only lg:hidden">Surprends-moi : un jeu au hasard</span>

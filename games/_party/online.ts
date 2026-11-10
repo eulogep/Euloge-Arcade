@@ -50,7 +50,11 @@ export async function rpc<T = unknown>(fn: string, args: Record<string, unknown>
 
 /**
  * Calls `onChange` whenever the room changes (Realtime on party_rooms.version), with a
- * polling safety net: every 4 s while Realtime is not connected, every 20 s otherwise.
+ * polling safety net: every 4 s while Realtime is not listening, every 10 s otherwise.
+ *
+ * "Listening" starts with Realtime's `system` message confirming the PostgreSQL
+ * subscription, which arrives AFTER the channel reports SUBSCRIBED: changes made in
+ * between are not delivered, so we catch up (re-read) at that moment.
  */
 export function watchRoom(roomId: string, onChange: () => void): () => void {
   let live = false;
@@ -64,7 +68,13 @@ export function watchRoom(roomId: string, onChange: () => void): () => void {
     timer = window.setTimeout(() => {
       onChange();
       schedule();
-    }, live ? 20_000 : 4_000);
+    }, live ? 10_000 : 4_000);
+  };
+  const setLive = (next: boolean) => {
+    const wasLive = live;
+    live = next;
+    if (live && !wasLive) onChange(); // catch up on anything missed while connecting
+    schedule();
   };
 
   void getClient().then((sb) => {
@@ -72,11 +82,11 @@ export function watchRoom(roomId: string, onChange: () => void): () => void {
     const channel = sb
       .channel(`party-room-${roomId}`)
       .on('postgres_changes', {event: '*', schema: 'public', table: 'party_rooms', filter: `id=eq.${roomId}`}, () => onChange())
+      .on('system', {}, (msg: {extension?: string; status?: string}) => {
+        if (msg?.extension === 'postgres_changes') setLive(msg.status === 'ok');
+      })
       .subscribe((status) => {
-        const wasLive = live;
-        live = status === 'SUBSCRIBED';
-        if (live && !wasLive) onChange(); // catch up on anything missed while connecting
-        schedule();
+        if (status !== 'SUBSCRIBED') setLive(false);
       });
     unsubscribe = () => void sb.removeChannel(channel);
   });

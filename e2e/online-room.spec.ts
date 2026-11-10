@@ -103,3 +103,73 @@ test('a wrong code and a taken name are explained to the player', async ({page, 
   await expect(guest.getByRole('alert')).toContainText('déjà pris');
   await guest.context().close();
 });
+
+test('a player joining while Realtime is still connecting is not missed', async ({page, browser, baseURL}) => {
+  // Reproduce the gap between "channel SUBSCRIBED" and Realtime actually listening to
+  // PostgreSQL: hold the "Subscribed to PostgreSQL" confirmation for 3 s and drop the
+  // change notifications that would not have been delivered before it.
+  let listening = false;
+  await page.routeWebSocket(/\/realtime\/v1\/websocket/, (ws) => {
+    const server = ws.connectToServer();
+    ws.onMessage((m) => server.send(m));
+    server.onMessage((m) => {
+      const text = String(m);
+      if (text.includes('Subscribed to PostgreSQL')) {
+        setTimeout(() => {
+          listening = true;
+          ws.send(m);
+        }, 3000);
+      } else if (text.includes('"postgres_changes",{"data"') && !listening) {
+        // lost change: not delivered
+      } else {
+        ws.send(m);
+      }
+    });
+  });
+
+  await goOnline(page, 'Hôte');
+  await page.getByRole('button', {name: 'Créer un salon'}).click();
+  await expect(page.getByRole('heading', {name: 'Salle d’attente'})).toBeVisible();
+  const code = ((await page.getByLabel(/^Code [A-Z2-9] /).textContent()) ?? '').trim();
+
+  const guest = await player(browser, baseURL);
+  await goOnline(guest, 'Invité');
+  await guest.getByLabel('Code du salon').fill(code);
+  await guest.getByRole('button', {name: 'Rejoindre'}).click();
+  await expect(guest.getByRole('heading', {name: 'Salle d’attente'})).toBeVisible();
+  expect(listening, 'the join happened before Realtime was listening').toBe(false);
+
+  // Caught up as soon as Realtime confirms, well before the slow safety poll.
+  await expect(page.getByText(/Joueurs \(2\/16\)/)).toBeVisible({timeout: 6000});
+  await guest.context().close();
+});
+
+test('a network failure while syncing keeps the player in the room', async ({page, browser, baseURL}) => {
+  await goOnline(page, 'Hôte');
+  await page.getByRole('button', {name: 'Créer un salon'}).click();
+  await expect(page.getByRole('heading', {name: 'Salle d’attente'})).toBeVisible();
+  const code = ((await page.getByLabel(/^Code [A-Z2-9] /).textContent()) ?? '').trim();
+
+  // The host's next state read fails (server unreachable).
+  let failed = false;
+  await page.route('**/rest/v1/rpc/party_state', async (route) => {
+    if (failed) return route.continue();
+    failed = true;
+    await route.fulfill({status: 503, contentType: 'application/json', body: '{"message":"upstream unavailable"}'});
+  });
+
+  const join = async (name: string) => {
+    const g = await player(browser, baseURL);
+    await goOnline(g, name);
+    await g.getByLabel('Code du salon').fill(code);
+    await g.getByRole('button', {name: 'Rejoindre'}).click();
+    await expect(g.getByRole('heading', {name: 'Salle d’attente'})).toBeVisible();
+    return g;
+  };
+  const g1 = await join('Invité 1');
+  await expect.poll(() => failed).toBe(true);
+  await expect(page.getByRole('heading', {name: 'Salle d’attente'})).toBeVisible(); // not ejected
+  const g2 = await join('Invité 2');
+  await expect(page.getByText(/Joueurs \(3\/16\)/)).toBeVisible({timeout: 6000});
+  await Promise.all([g1.context().close(), g2.context().close()]);
+});
