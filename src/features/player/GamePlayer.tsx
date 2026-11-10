@@ -69,7 +69,16 @@ function formatClock(sec: number): string {
  *    built-in Holo-Cartridge Arcade Suite (/games/arcade-suite/index.html) or streamed via iframe,
  *    while also preserving the official external link.
  */
-export function GamePlayer({game, autoStart = false}: {game: Game; autoStart?: boolean}) {
+export function GamePlayer({
+  game,
+  autoStart = false,
+  launchQuery,
+}: {
+  game: Game;
+  autoStart?: boolean;
+  /** Extra query string for first-party hosted games (e.g. `challenge=daily`). */
+  launchQuery?: string;
+}) {
   const {catalog, recordLaunch} = usePlatform();
   const allowlist = catalog.status === 'ready' ? catalog.embedDomains : [];
   const decision = decideLaunch(game, allowlist);
@@ -142,7 +151,9 @@ export function GamePlayer({game, autoStart = false}: {game: Game; autoStart?: b
   }, [state.phase, attempt]);
 
   const activeIframeSrc =
-    decision.kind === 'hosted' || decision.kind === 'embed'
+    decision.kind === 'hosted' && launchQuery
+      ? `${decision.src}${decision.src.includes('?') ? '&' : '?'}${launchQuery}`
+      : decision.kind === 'hosted' || decision.kind === 'embed'
       ? decision.src
       : engineMode === 'stream' && decision.kind === 'external'
         ? decision.href

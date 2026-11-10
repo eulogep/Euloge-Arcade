@@ -12,6 +12,7 @@ import {
 import {GameRail} from '@/components/gaming/GameRail';
 import {EmptyState, ErrorState, Skeleton} from '@/components/ui/feedback';
 import {ControlsList} from '@/features/game/ControlsList';
+import {DAILY_CHALLENGE_GAMES, DailyChallengePanel} from '@/features/game/DailyChallengePanel';
 import {GamePlayer} from '@/features/player/GamePlayer';
 import {useDocumentTitle} from '@/hooks/useDocumentTitle';
 import {LAUNCH_MODE_LABELS, similarGames} from '@/lib/catalog';
@@ -35,7 +36,8 @@ function formatDuration(s: number | null) {
 
 function Scores({game}: {game: Game}) {
   const {runs, backendEnabled, user} = usePlatform();
-  const mine = runs.filter((r) => r.gameId === game.id);
+  // Personal record = standard runs only (challenge runs use modified rules).
+  const mine = runs.filter((r) => r.gameId === game.id && !r.challenge);
   const best = mine.reduce<(typeof mine)[number] | null>((b, r) => (!b || r.score > b.score ? r : b), null);
   const [board, setBoard] = useState<LeaderboardRow[] | null>(null);
   const [boardError, setBoardError] = useState(false);
@@ -148,6 +150,8 @@ export default function GameDetailsPage() {
 
   const isThirdParty = game.licenseStatus !== 'owned';
   const cartridgeCode = getCartridgeCode(game);
+  const hasDailyChallenge = game.supportsScores && DAILY_CHALLENGE_GAMES.has(game.slug);
+  const challengeLaunch = hasDailyChallenge && params.get('defi') === '1';
 
   return (
     <div>
@@ -184,12 +188,18 @@ export default function GameDetailsPage() {
           </div>
         </div>
 
-        <div className="mt-8">
-          <GamePlayer game={game} autoStart={autoStart} />
+        <div id="lecteur" className="mt-8 scroll-mt-20">
+          <GamePlayer game={game} autoStart={autoStart} launchQuery={challengeLaunch ? 'challenge=daily' : undefined} />
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-8">
+            {hasDailyChallenge && (
+              <DailyChallengePanel
+                game={game}
+                onStart={() => document.getElementById('lecteur')?.scrollIntoView({behavior: 'smooth', block: 'start'})}
+              />
+            )}
             <section aria-labelledby="about-game" className="holo-panel rounded-2xl p-6">
               <h2 id="about-game" className="section-title mb-3 flex items-center gap-2">
                 <Info size={20} className="text-accent-3" /> À propos du jeu

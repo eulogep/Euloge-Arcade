@@ -14,6 +14,8 @@ export interface RunRecord {
   startLevel: number | null;
   deaths: number | null;
   createdAt: string;
+  /** UTC day key when played as that day's challenge (modified rules), else null/absent. */
+  challenge?: string | null;
 }
 
 export interface ActivitySnapshot {
@@ -24,7 +26,8 @@ export interface ActivitySnapshot {
 
 type Rule = (s: ActivitySnapshot) => boolean;
 
-const sbRuns = (s: ActivitySnapshot) => s.runs.filter((r) => r.gameSlug === 'system-breach');
+// Challenge runs use modified rules (e.g. ×3 fragment points): they don't count here.
+const sbRuns = (s: ActivitySnapshot) => s.runs.filter((r) => r.gameSlug === 'system-breach' && !r.challenge);
 
 export const ACHIEVEMENT_RULES: Record<string, Rule> = {
   'first-launch': (s) => s.launchedGameIds.length >= 1,

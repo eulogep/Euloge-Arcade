@@ -1,12 +1,13 @@
 import {useEffect, type RefObject} from 'react';
 import {usePlatform} from '@/app/PlatformProvider';
+import {isChallengeDay} from '@/lib/dailyChallenge';
 import type {Game} from '@/types/game';
 
 interface RunMessage {
   source: 'euloge-arcade-game';
   version: 1;
   type: 'run-finished';
-  payload: {score: number; timeElapsed: number; victory: boolean; startLevel: number; deaths: number};
+  payload: {score: number; timeElapsed: number; victory: boolean; startLevel: number; deaths: number; challenge?: unknown};
 }
 
 function isRunMessage(data: unknown): data is RunMessage {
@@ -45,8 +46,13 @@ export function useHostedScoreBridge(game: Game, iframeRef: RefObject<HTMLIFrame
         startLevel: Number.isInteger(p.startLevel) ? p.startLevel : null,
         deaths: Number.isInteger(p.deaths) ? p.deaths : null,
         createdAt: new Date().toISOString(),
+        challenge: isChallengeDay(p.challenge) ? p.challenge : null,
       });
-      notify({tone: 'info', title: 'Partie enregistrée', body: `${game.title} · ${Math.round(p.score)} pts`});
+      notify({
+        tone: 'info',
+        title: isChallengeDay(p.challenge) ? 'Défi du jour enregistré' : 'Partie enregistrée',
+        body: `${game.title} · ${Math.round(p.score)} pts`,
+      });
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);

@@ -51,6 +51,7 @@ e2e/                   tests Playwright
 | Catalogue | table `public.games` | `src/data/games.seed.json` ne sert qu'à **amorcer** une base vide (`seed.sql` est généré à partir de lui) et à faire tourner le **mode local** sans backend. Il n'existe aucune autre liste de jeux dans le frontend. |
 | Domaines intégrables | table `public.embed_domains` | même principe (`embed-domains.seed.json`) |
 | Succès | table `public.achievements` (textes) + `features/achievements/evaluate.ts` (conditions) | |
+| Défi du jour (System Breach) | `src/lib/dailyChallenge.ts` (générateur déterministe partagé par le jeu et la plateforme) | une partie de défi est une ligne de `scores` avec `meta.challenge = 'AAAA-MM-JJ'` (jour UTC). La base refuse un jour clos (trigger `validate_score_challenge`, 2 h de grâce après minuit) ; `daily_challenge_leaderboard` classe le jour ; le classement général et les succès ignorent ces parties. |
 | Saisons (Halloween, fêtes d'hiver…) | `src/lib/season.ts` (`SEASONS` : dates, libellé) | couleurs et ambiance dans `styles/index.css`, décor dans `components/layout/SeasonalAtmosphere.tsx`. En développement, `?saison=winter` (ou `halloween`, `aucune`) force une saison pour l'aperçu. |
 | Identité de marque | `src/config/brand.ts` | lue par l'interface **et** par `vite.config.ts` (métadonnées HTML) |
 
@@ -125,6 +126,6 @@ Mesures sur le build de production (`vite preview`), Chromium 1366×768, via `Pe
 
 | Niveau | Outil | Couverture |
 | --- | --- | --- |
-| Unitaires | Vitest (69) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
-| Base de données | pgTAP (30) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
-| End-to-end | Playwright (32) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |
+| Unitaires | Vitest (75) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
+| Base de données | pgTAP (37) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
+| End-to-end | Playwright (33) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |

@@ -10,6 +10,8 @@ export interface FinishedRun {
   victory: boolean;
   startLevel: number;
   deaths: number;
+  /** UTC day key of the daily challenge this run was played under, or null. */
+  challenge: string | null;
 }
 
 export function reportRunToPlatform(run: FinishedRun) {

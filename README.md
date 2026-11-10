@@ -14,7 +14,7 @@ Découvre, lance, rejoue. Sans installation, sans publicité, sans faux compteur
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-2F7BFF?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0B0F24)
 ![Supabase](https://img.shields.io/badge/Supabase-RLS-A24DFF?style=for-the-badge&logo=supabase&logoColor=white&labelColor=0B0F24)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38E1FF?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=0B0F24)
-![Tests](https://img.shields.io/badge/tests-131-34D399?style=for-the-badge&labelColor=0B0F24)
+![Tests](https://img.shields.io/badge/tests-145-34D399?style=for-the-badge&labelColor=0B0F24)
 
 **Created by Euloge**
 
@@ -76,6 +76,8 @@ Chaque jeu tiers a une **illustration originale** de la plateforme, générée p
 
 Plateformer d'action cyberpunk : double saut, **dash** invulnérable, blaster, drones qui ripostent, combos jusqu'à x5, trois boss à phases, mode contre-la-montre, rang final S/A/B/C. Jouable au clavier, à la souris et sur mobile. Ses scores alimentent les classements de la plateforme.
 
+**Défi du jour** : chaque jour (minuit UTC), tous les joueurs reçoivent le même secteur de départ et deux modificateurs (une seule vie, gravité réduite, ruée de données…), avec un classement dédié. Les parties du défi ne comptent ni pour le classement général ni pour les succès.
+
 ## Sous le capot
 
 ```text
@@ -100,9 +102,9 @@ Détails et décisions : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 | | Résultat |
 | --- | --- |
-| Tests unitaires | **69** · recherche, filtres, tri, recommandations, succès, liste blanche, validation, import |
-| Tests de sécurité base de données | **30** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur |
-| Tests end-to-end | **32** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
+| Tests unitaires | **75** · recherche, filtres, tri, recommandations, succès, liste blanche, validation, import |
+| Tests de sécurité base de données | **37** · RLS, escalade de rôle, liste blanche, droits de publication, succès attribués par le serveur, défi du jour |
+| Tests end-to-end | **33** · navigation, 3 modes de lancement, plein écran, lien mort, comptes, favoris, droits admin, mobile, accessibilité, CSP |
 | Layout shift (4G lente, CPU ×4) | **0,002** |
 | Accueil en 4G lente | **1,6 s** (affichage du plus gros élément) |
 | Dépendances de production | **0 vulnérabilité connue** |
