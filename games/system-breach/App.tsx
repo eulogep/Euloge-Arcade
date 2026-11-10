@@ -22,8 +22,15 @@ import {
   Flame,
   Award,
   Crosshair,
+  CalendarDays,
 } from 'lucide-react';
-import {getConfig} from './constants';
+import {baseConfigNumber, getConfig, setConfigOverrides} from './constants';
+import {
+  challengeSettings,
+  getDailyChallenge,
+  type DailyChallenge,
+  type TunableSetting,
+} from '../../src/lib/dailyChallenge';
 import BackgroundMusic from './utils/BackgroundMusic';
 import {
   createFixedStepper,
@@ -899,6 +906,22 @@ interface GameRecords {
 
 const RECORDS_KEY = 'system-breach-records';
 
+const TUNABLE_KEYS: TunableSetting[] = [
+  'startingLives',
+  'maxIntegrity',
+  'hazardDamage',
+  'playerSpeed',
+  'playerJumpForce',
+  'gravityFalling',
+  'blasterCooldown',
+  'blasterDamage',
+  'fragmentScoreValue',
+];
+
+/** Default values of the settings daily-challenge modifiers may change. */
+const TUNABLE_BASE = () =>
+  Object.fromEntries(TUNABLE_KEYS.map((k) => [k, baseConfigNumber(k)])) as Record<TunableSetting, number>;
+
 function loadRecords(): GameRecords {
   try {
     const raw = window.localStorage.getItem(RECORDS_KEY);
@@ -984,6 +1007,11 @@ export default function App() {
   const [records, setRecords] = useState<GameRecords>(loadRecords);
   const [newRecord, setNewRecord] = useState({score: false, time: false});
   const runStartLevelRef = useRef(1);
+
+  // Daily challenge: same sector and modifiers for every player on a UTC day.
+  const [todayChallenge] = useState<DailyChallenge>(() => getDailyChallenge());
+  const [activeChallenge, setActiveChallenge] = useState<DailyChallenge | null>(null);
+  const runChallengeRef = useRef<string | null>(null);
 
   // Focus ref for autoFocus primary buttons
   const startBtnRef = useAutoFocus<HTMLButtonElement>(gameState.status === 'START');
@@ -1117,7 +1145,13 @@ export default function App() {
     }));
   }, []);
 
-  const initGame = useCallback((startLevel = 1, timeAttack = false) => {
+  const initGame = useCallback((requestedLevel = 1, requestedTimeAttack = false, challenge: DailyChallenge | null = null) => {
+    // Overrides must be in place before loadSector() reads integrity and lives.
+    setConfigOverrides(challenge ? challengeSettings(challenge, TUNABLE_BASE()) : {});
+    setActiveChallenge(challenge);
+    runChallengeRef.current = challenge?.day ?? null;
+    const startLevel = challenge ? challenge.startSector : requestedLevel;
+    const timeAttack = challenge ? false : requestedTimeAttack;
     setIsTimeAttackMode(timeAttack);
     runStartLevelRef.current = startLevel;
     setNewRecord({score: false, time: false});
@@ -1131,6 +1165,7 @@ export default function App() {
       level: startLevel,
       lives: getConfig('startingLives') as number,
       integrity: getConfig('maxIntegrity') as number,
+      maxIntegrity: getConfig('maxIntegrity') as number,
       timeElapsed: 0,
       totalFragmentsCollected: 0,
       enemiesKilled: 0,
@@ -1159,6 +1194,24 @@ export default function App() {
     }
   }, [initGame]);
 
+  // Launched from the platform's "Relever le défi" button (?challenge=daily)
+  const hasAutoChallenged = useRef(false);
+  useEffect(() => {
+    if (
+      !hasAutoChallenged.current &&
+      new URLSearchParams(window.location.search).get('challenge') === 'daily'
+    ) {
+      hasAutoChallenged.current = true;
+      initGame(1, false, getDailyChallenge());
+    }
+  }, [initGame]);
+
+  /** Restart the same kind of run: today's challenge, time attack, or story. */
+  const restartRun = useCallback(() => {
+    if (runChallengeRef.current) initGame(1, false, getDailyChallenge());
+    else initGame(1, isTimeAttackMode);
+  }, [initGame, isTimeAttackMode]);
+
   // Win / Loss Status SFX
   useEffect(() => {
     if (gameState.status === 'GAME_OVER') {
@@ -1169,11 +1222,13 @@ export default function App() {
 
     if (gameState.status === 'GAME_OVER' || gameState.status === 'VICTORY') {
       const prev = loadRecords();
+      // Challenge runs use modified rules: they feed the daily board, not personal records.
+      const isChallengeRun = runChallengeRef.current !== null;
       const isFullRun = gameState.status === 'VICTORY' && runStartLevelRef.current === 1;
       const scoreRecord = gameState.score > prev.bestScore;
       const timeRecord =
         isFullRun && (prev.bestTime === null || gameState.timeElapsed < prev.bestTime);
-      if (scoreRecord || timeRecord) {
+      if (!isChallengeRun && (scoreRecord || timeRecord)) {
         const next: GameRecords = {
           bestScore: scoreRecord ? gameState.score : prev.bestScore,
           bestTime: timeRecord ? gameState.timeElapsed : prev.bestTime,
@@ -1181,13 +1236,14 @@ export default function App() {
         saveRecords(next);
         setRecords(next);
       }
-      setNewRecord({score: scoreRecord, time: timeRecord});
+      setNewRecord({score: !isChallengeRun && scoreRecord, time: !isChallengeRun && timeRecord});
       reportRunToPlatform({
         score: gameState.score,
         timeElapsed: gameState.timeElapsed,
         victory: gameState.status === 'VICTORY',
         startLevel: runStartLevelRef.current,
         deaths: gameState.deaths ?? 0,
+        challenge: runChallengeRef.current,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3078,6 +3134,14 @@ export default function App() {
               {gameState.fragmentsCount ?? 0} FRAGS
             </span>
           </div>
+          {activeChallenge && (
+            <div
+              className="hidden md:flex items-center gap-1 bg-amber-950/60 px-2 py-1 rounded border border-amber-500/40 text-amber-200 text-[10px] font-bold tracking-wider"
+              title={`Daily challenge ${activeChallenge.day}`}>
+              <CalendarDays size={13} className="text-amber-400" />
+              <span>DAILY · {activeChallenge.modifiers.map((m) => m.labelEn).join(' + ')}</span>
+            </div>
+          )}
           {isTimeAttackMode && (
             <div className="flex items-center gap-1 bg-purple-950/60 px-2 py-1 rounded border border-purple-500/40 text-purple-200 text-xs font-bold">
               <Clock size={14} className="text-purple-400" />
@@ -3353,6 +3417,22 @@ export default function App() {
                 SPEEDRUN TIME ATTACK MODE
               </button>
 
+              {/* Daily Challenge */}
+              <button
+                onClick={() => {
+                  gameAudio.playCrispClick();
+                  initGame(1, false, getDailyChallenge());
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm flex flex-col items-center justify-center gap-0.5 shadow-[0_0_15px_rgba(245,158,11,0.35)] transition-colors">
+                <span className="flex items-center gap-2">
+                  <CalendarDays size={16} />
+                  DAILY CHALLENGE · {todayChallenge.day}
+                </span>
+                <span className="text-[10px] font-semibold tracking-wider opacity-90">
+                  SECTOR 0{todayChallenge.startSector} · {todayChallenge.modifiers.map((m) => m.labelEn).join(' + ')}
+                </span>
+              </button>
+
               {/* How to play */}
               <button
                 onClick={() => {
@@ -3396,7 +3476,7 @@ export default function App() {
             newRecord.score ? ' — NEW BEST SCORE!' : ` (Best: ${records.bestScore})`
           }`}
           actionLabel="RE-INFILTRATE"
-          onAction={() => initGame(1, isTimeAttackMode)}
+          onAction={restartRun}
           icon={<RotateCw size={22} />}
           tone="danger"
         />
@@ -3465,7 +3545,7 @@ export default function App() {
               autoFocus
               onClick={() => {
                 gameAudio.playCrispClick();
-                initGame(1, isTimeAttackMode);
+                restartRun();
               }}
               className="w-full bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 px-6 py-3.5 rounded-xl font-black text-base flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(52,211,153,0.4)] active:scale-95 transition-all">
               <RotateCw size={20} />

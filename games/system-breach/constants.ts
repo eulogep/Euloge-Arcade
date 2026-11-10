@@ -283,5 +283,21 @@ export type ConfigKey = keyof typeof CONFIG;
 export function getConfig<K extends ConfigKey>(
   key: K,
 ): (typeof CONFIG)[K]['value'] {
-  return CONFIG[key].value;
+  const override = overrides[key];
+  return (override !== undefined ? override : CONFIG[key].value) as (typeof CONFIG)[K]['value'];
+}
+
+/**
+ * Per-run numeric overrides (daily challenge modifiers). Values are read live by the
+ * game loop, so they take effect as soon as a run starts. Pass {} to restore defaults.
+ */
+let overrides: Partial<Record<ConfigKey, number>> = {};
+
+export function setConfigOverrides(next: Partial<Record<ConfigKey, number>>) {
+  overrides = {...next};
+}
+
+/** Default value of a numeric setting, ignoring overrides. */
+export function baseConfigNumber(key: ConfigKey): number {
+  return CONFIG[key].value as number;
 }

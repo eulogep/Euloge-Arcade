@@ -1,7 +1,6 @@
 import {
   Command,
   Dices,
-  Ghost,
   Heart,
   Home,
   LayoutGrid,
@@ -17,6 +16,7 @@ import {
 import {useEffect, useRef, useState} from 'react';
 import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {usePlatform, type ChromaSkin} from '@/app/PlatformProvider';
+import {SeasonalBadge} from '@/components/layout/SeasonalAtmosphere';
 import {Logo} from '@/components/ui/Logo';
 import {cn} from '@/lib/cn';
 import {pickRandom} from '@/lib/catalog';
@@ -222,8 +222,8 @@ function AccountMenu() {
   }
   if (!user) {
     return (
-      <Link to="/connexion" className="btn-secondary h-10 min-h-0 px-3">
-        <LogIn size={16} /> <span className="hidden sm:inline">Connexion</span>
+      <Link to="/connexion" className="btn-secondary h-10 min-h-0 px-3" aria-label="Connexion">
+        <LogIn size={16} aria-hidden /> <span className="hidden sm:inline">Connexion</span>
       </Link>
     );
   }
@@ -301,9 +301,7 @@ export function Header() {
           <Logo className="hidden sm:inline-flex" />
           <Logo compact className="sm:hidden" />
         </Link>
-        <span className="halloween-badge hidden xl:inline-flex">
-          <Ghost size={14} aria-hidden /> Halloween
-        </span>
+        <SeasonalBadge />
         <nav aria-label="Navigation principale" className="hidden items-center gap-1 md:flex">
           {NAV.map(({to, label, end}) => (
             <NavLink

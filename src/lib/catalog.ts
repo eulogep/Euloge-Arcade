@@ -11,6 +11,7 @@ export const GENRE_LABELS: Record<Genre, string> = {
   retro: 'Rétro',
   racing: 'Course',
   sports: 'Sport',
+  party: 'Entre amis',
 };
 
 export const LAUNCH_MODE_LABELS: Record<LaunchMode, string> = {

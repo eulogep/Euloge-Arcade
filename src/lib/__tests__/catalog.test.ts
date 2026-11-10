@@ -48,7 +48,7 @@ describe('filters', () => {
   it('"in-browser" excludes external games', () => {
     const r = queryCatalog(seedGames, {...EMPTY_QUERY, features: ['in-browser']});
     expect(r.every((g) => g.launchMode !== 'external')).toBe(true);
-    expect(r.map((g) => g.slug).sort()).toEqual(['lichess-daily-puzzle', 'system-breach']);
+    expect(r.map((g) => g.slug).sort()).toEqual(['chroma-clash', 'lichess-daily-puzzle', 'loups-de-minuit', 'micro-neon', 'system-breach']);
   });
 });
 

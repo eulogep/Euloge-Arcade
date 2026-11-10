@@ -1571,5 +1571,167 @@
     "link_check_detail": "HTTPS 200. Ouverture externe obligatoire : X-Frame-Options SAMEORIGIN.",
     "created_at": "2026-10-15T00:00:00Z",
     "updated_at": "2026-10-15T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000040",
+    "slug": "loups-de-minuit",
+    "title": "Loups de Minuit",
+    "tagline": "Qui, parmi vous, est un loup-garou ? Débattez, votez, survivez.",
+    "description": "Jeu de rôles et de bluff pour 4 à 16 joueurs réunis dans la même pièce, sur un seul téléphone ou une tablette. Chacun découvre son rôle en secret : loup-garou, voyante, protecteur ou simple villageois. La nuit, l'appareil fait le tour de la table et chacun agit en secret ; le jour, le village débat puis vote pour éliminer un suspect. Les loups gagnent s'ils deviennent aussi nombreux que le village, le village gagne s'il les démasque tous.",
+    "instructions": "Asseyez-vous en cercle et passez l'appareil dans l'ordre affiché. Ne regardez l'écran que lorsque votre prénom s'affiche. La nuit, tout le monde agit, même les villageois (ils désignent un suspect sans effet), pour qu'aucun geste ne trahisse un rôle. Au matin, l'application annonce la victime ; le débat est chronométré, puis le village vote à main levée.",
+    "genre": [
+      "party",
+      "strategy"
+    ],
+    "cover_url": "/covers/loups-de-minuit.jpg",
+    "banner_url": "/covers/loups-de-minuit-banner.jpg",
+    "launch_mode": "hosted",
+    "launch_url": "/games/loups-de-minuit/index.html",
+    "source_url": null,
+    "developer": "Euloge",
+    "license_status": "owned",
+    "license_notes": "Jeu original d'Euloge Arcade, d'après le jeu de société traditionnel du loup-garou (aussi appelé « Mafia »). Rôles, textes et visuels originaux.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": true,
+      "gamepad": false,
+      "touch": true,
+      "verified": true
+    },
+    "controls": [
+      {
+        "device": "touch",
+        "input": "Toucher",
+        "action": "Choisir un joueur, valider"
+      },
+      {
+        "device": "mouse",
+        "input": "Clic",
+        "action": "Choisir un joueur, valider"
+      },
+      {
+        "device": "keyboard",
+        "input": "Tab / Entrée",
+        "action": "Naviguer et valider"
+      }
+    ],
+    "orientation": "any",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-11-10T00:00:00Z",
+    "link_status": "unchecked",
+    "link_checked_at": null,
+    "created_at": "2026-11-10T00:00:00Z",
+    "updated_at": "2026-11-10T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000041",
+    "slug": "chroma-clash",
+    "title": "Chroma Clash",
+    "tagline": "Couleurs, chiffres et coups bas : sois le premier à vider ta main.",
+    "description": "Jeu de cartes original pour 2 à 8 joueurs, humains ou bots, sur un seul appareil. Pose une carte de la même couleur, du même chiffre ou du même symbole que celle du dessus. Bond, Retour, +2, Prisme et Surcharge +3 pimentent la partie ; enchaîne des combos de chiffres identiques et renvoie les pénalités en les cumulant. N'oublie pas d'annoncer « Dernière carte ! ».",
+    "instructions": "Touche une ou plusieurs cartes pour les sélectionner, puis « Poser ». Sans carte jouable, pioche : si la carte piochée est jouable, tu peux la poser. Avant de poser ton avant-dernière carte, touche « Dernière carte ! », sinon tu pioches 2. Entre deux joueurs humains, l'appareil affiche un écran de passage pour garder les mains secrètes.",
+    "genre": [
+      "party",
+      "board"
+    ],
+    "cover_url": "/covers/chroma-clash.jpg",
+    "banner_url": "/covers/chroma-clash-banner.jpg",
+    "launch_mode": "hosted",
+    "launch_url": "/games/chroma-clash/index.html",
+    "source_url": null,
+    "developer": "Euloge",
+    "license_status": "owned",
+    "license_notes": "Jeu original d'Euloge Arcade de la famille des jeux de défausse (type « huit américain »). Paquet, règles, nom et visuels originaux ; sans lien avec aucun jeu de cartes commercial.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": true,
+      "gamepad": false,
+      "touch": true,
+      "verified": true
+    },
+    "controls": [
+      {
+        "device": "touch",
+        "input": "Toucher une carte",
+        "action": "Sélectionner (plusieurs pour un combo)"
+      },
+      {
+        "device": "mouse",
+        "input": "Clic",
+        "action": "Sélectionner, poser, piocher"
+      },
+      {
+        "device": "keyboard",
+        "input": "Tab / Entrée",
+        "action": "Naviguer et valider"
+      }
+    ],
+    "orientation": "any",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-11-10T00:00:00Z",
+    "link_status": "unchecked",
+    "link_checked_at": null,
+    "created_at": "2026-11-10T00:00:00Z",
+    "updated_at": "2026-11-10T00:00:00Z"
+  },
+  {
+    "id": "6f1c2a10-0000-4000-8000-000000000042",
+    "slug": "micro-neon",
+    "title": "Micro Néon",
+    "tagline": "Le karaoké qui écoute ta voix et note ta justesse en direct.",
+    "description": "Karaoké pour toute la soirée, de 1 à 12 chanteurs sur un seul appareil. Les paroles s'allument syllabe par syllabe pendant que les notes défilent ; le micro mesure ta justesse en direct, sur l'appareil, sans rien enregistrer. Chansons traditionnelles du domaine public, échauffement vocal, choix de la tonalité, classement de la soirée, et import de tes propres chansons (paroles .lrc + audio) en mode libre.",
+    "instructions": "Active le micro et chante un « laaa » pour vérifier que ta voix est détectée. Choisis une chanson, écoute la mélodie si besoin, puis chante après le décompte : pendant la notation, seul le métronome joue. Aligne ta voix (points roses) sur les barres des notes. L'octave n'est pas pénalisée.",
+    "genre": [
+      "party",
+      "arcade"
+    ],
+    "cover_url": "/covers/micro-neon.jpg",
+    "banner_url": "/covers/micro-neon-banner.jpg",
+    "launch_mode": "hosted",
+    "launch_url": "/games/micro-neon/index.html",
+    "source_url": null,
+    "developer": "Euloge",
+    "license_status": "owned",
+    "license_notes": "Jeu original d'Euloge Arcade. Chansons intégrées : chansons traditionnelles françaises du domaine public (paroles et mélodies). Les chansons importées restent sur l'appareil du joueur.",
+    "compatibility": {
+      "keyboard": true,
+      "mouse": true,
+      "gamepad": false,
+      "touch": true,
+      "verified": true
+    },
+    "controls": [
+      {
+        "device": "touch",
+        "input": "Toucher",
+        "action": "Choisir une chanson, lancer"
+      },
+      {
+        "device": "mouse",
+        "input": "Clic",
+        "action": "Choisir une chanson, lancer"
+      },
+      {
+        "device": "keyboard",
+        "input": "Tab / Entrée",
+        "action": "Naviguer et valider"
+      }
+    ],
+    "orientation": "any",
+    "featured": false,
+    "featured_rank": null,
+    "supports_scores": false,
+    "status": "published",
+    "published_at": "2026-11-10T00:00:00Z",
+    "link_status": "unchecked",
+    "link_checked_at": null,
+    "created_at": "2026-11-10T00:00:00Z",
+    "updated_at": "2026-11-10T00:00:00Z"
   }
 ]

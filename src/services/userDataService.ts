@@ -169,7 +169,7 @@ export class RemoteUserDataStore implements UserDataStore {
       .limit(200);
     if (error) throw error;
     return data.map((r) => {
-      const meta = (r.meta ?? {}) as {victory?: boolean; startLevel?: number; deaths?: number};
+      const meta = (r.meta ?? {}) as {victory?: boolean; startLevel?: number; deaths?: number; challenge?: string};
       return {
         gameId: r.game_id as string,
         gameSlug: this.slugById.get(r.game_id as string) ?? '',
@@ -179,6 +179,7 @@ export class RemoteUserDataStore implements UserDataStore {
         startLevel: meta.startLevel ?? null,
         deaths: meta.deaths ?? null,
         createdAt: r.created_at as string,
+        challenge: meta.challenge ?? null,
       } satisfies RunRecord;
     });
   }
@@ -193,7 +194,12 @@ export class RemoteUserDataStore implements UserDataStore {
       game_id: run.gameId,
       score: Math.max(0, Math.min(10_000_000, Math.round(run.score))),
       duration_seconds: run.durationSeconds === null ? null : Math.min(86400, Math.max(0, run.durationSeconds)),
-      meta: {victory: run.victory, startLevel: run.startLevel, deaths: run.deaths},
+      meta: {
+        victory: run.victory,
+        startLevel: run.startLevel,
+        deaths: run.deaths,
+        ...(run.challenge ? {challenge: run.challenge} : {}),
+      },
     });
     if (error) throw error;
   }

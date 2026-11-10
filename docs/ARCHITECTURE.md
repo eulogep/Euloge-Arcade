@@ -51,6 +51,8 @@ e2e/                   tests Playwright
 | Catalogue | table `public.games` | `src/data/games.seed.json` ne sert qu'à **amorcer** une base vide (`seed.sql` est généré à partir de lui) et à faire tourner le **mode local** sans backend. Il n'existe aucune autre liste de jeux dans le frontend. |
 | Domaines intégrables | table `public.embed_domains` | même principe (`embed-domains.seed.json`) |
 | Succès | table `public.achievements` (textes) + `features/achievements/evaluate.ts` (conditions) | |
+| Défi du jour (System Breach) | `src/lib/dailyChallenge.ts` (générateur déterministe partagé par le jeu et la plateforme) | une partie de défi est une ligne de `scores` avec `meta.challenge = 'AAAA-MM-JJ'` (jour UTC). La base refuse un jour clos (trigger `validate_score_challenge`, 2 h de grâce après minuit) ; `daily_challenge_leaderboard` classe le jour ; le classement général et les succès ignorent ces parties. |
+| Saisons (Halloween, fêtes d'hiver…) | `src/lib/season.ts` (`SEASONS` : dates, libellé) | couleurs et ambiance dans `styles/index.css`, décor dans `components/layout/SeasonalAtmosphere.tsx`. En développement, `?saison=winter` (ou `halloween`, `aucune`) force une saison pour l'aperçu. |
 | Identité de marque | `src/config/brand.ts` | lue par l'interface **et** par `vite.config.ts` (métadonnées HTML) |
 
 Données brutes (`*.seed.json`) → validées (`gameSchema` côté client, trigger `validate_game` côté serveur) → exploitées (`rowToGame` → type `Game`).
@@ -89,6 +91,13 @@ Données brutes (`*.seed.json`) → validées (`gameSchema` côté client, trigg
 - **En-têtes** : `public/_headers` impose une CSP sans script inline, `nosniff`, une `Permissions-Policy` et `frame-ancestors 'self'`. Le test `e2e/csp.spec.ts` vérifie le build de production sous cette CSP.
 - **Secrets** : seule la clé publique `anon` est présente côté client. La clé `service_role` n'est utilisée que dans les Edge Functions (variables d'environnement Supabase).
 
+## Jeux entre amis (même appareil)
+
+- `games/_party/` : kit commun (Tailwind, interface, saisie des prénoms gardés sur l'appareil, écran « passe l'appareil à… », mélange avec générateur injectable). Chaque jeu (`games/loups-de-minuit`, `games/chroma-clash`, `games/micro-neon`) est une entrée Vite séparée, avec sa logique dans un module pur et testé (`logic.ts`, `pitch.ts`, `lrc.ts`).
+- **Secret** : les informations privées (rôle, main de cartes) ne s'affichent qu'après que le joueur nommé a confirmé « C'est moi ». La nuit, tous les joueurs agissent, villageois compris, pour qu'aucun geste ne trahisse un rôle.
+- **Micro** : `Permissions-Policy: microphone=(self)` et l'iframe reçoit `allow="microphone"` uniquement pour `micro-neon` (`MICROPHONE_GAMES` dans `GamePlayer`). Le son est analysé en mémoire (autocorrélation normalisée), jamais enregistré ni envoyé. Pendant la notation, seul un métronome en bruit filtré joue, pour que le micro n'entende que la voix. `media-src blob:` sert à lire l'audio importé localement.
+- **Genre** `party` (« Entre amis ») : ajouté au type, à la validation zod et au trigger `validate_game` (migration `20261110180000_party_games.sql`, qui insère aussi les trois jeux).
+
 ## Ajouter un jeu
 
 - **Hébergé (A)** :
@@ -124,6 +133,6 @@ Mesures sur le build de production (`vite preview`), Chromium 1366×768, via `Pe
 
 | Niveau | Outil | Couverture |
 | --- | --- | --- |
-| Unitaires | Vitest (65) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
-| Base de données | pgTAP (30) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
-| End-to-end | Playwright (32) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |
+| Unitaires | Vitest (104) | recherche, filtres, tri, URL, recommandations, succès, liste blanche, décision de lancement, validation, détection du framing |
+| Base de données | pgTAP (38) | RLS (anonyme, joueur, admin), escalade de rôle, favoris d'autrui, scores, succès (insertion directe refusée, conditions revérifiées), liste blanche, droits d'hébergement, publication non vérifiée |
+| End-to-end | Playwright (38) | navigation, intro, recherche et filtres, 3 modes de lancement, plein écran, lien mort, fichier manquant, inscription, erreurs d'auth, fusion des favoris, autorisation admin (interface + API), création et publication de jeu, refus d'un domaine non autorisé, mobile, accessibilité axe (WCAG A/AA), CSP |

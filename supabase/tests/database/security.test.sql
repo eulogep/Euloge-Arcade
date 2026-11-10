@@ -1,7 +1,7 @@
 -- Server-side authorization & validation tests. Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(30);
+select plan(38);
 
 -- Fixtures: one admin, one player ------------------------------------------
 insert into auth.users (id, email, raw_user_meta_data, aud, role)
@@ -18,6 +18,9 @@ select is(
 set local role anon;
 select ok((select count(*) from public.games) > 0, 'anon can read published games');
 select is((select count(*)::int from public.games where status <> 'published'), 0, 'anon never sees drafts');
+select is(
+  (select count(*)::int from public.games where 'party' = any (genre) and launch_mode = 'hosted'),
+  3, 'the three hosted party games are published with the party genre');
 select throws_ok(
   $$insert into public.games (slug, title, description, genre, launch_mode, launch_url, license_status)
     values ('hack', 'Hack', 'xxxxxxxxxxxx', array['arcade'], 'external', 'https://example.com', 'link_only')$$,
@@ -26,6 +29,10 @@ select ok((select count(*) from public.game_popularity(30)) >= 0, 'anon can read
 select throws_ok(
   $$select public.claim_achievements(array['first-launch'])$$,
   '42501', null, 'anon cannot claim achievements');
+select ok(
+  (select count(*) from public.daily_challenge_leaderboard(
+    (select id from public.games where slug = 'system-breach'), '2026-01-01')) >= 0,
+  'anon can read the daily challenge board');
 reset role;
 
 -- Player --------------------------------------------------------------------
@@ -88,6 +95,32 @@ select is(
 select is(
   (select count(*)::int from public.user_achievements),
   2, 'player owns exactly the achievements they earned');
+
+-- Daily challenge: today's board only, kept out of the all-time board and achievements
+select lives_ok(
+  $$insert into public.scores (game_id, score, meta)
+    select id, 9000, jsonb_build_object('challenge', to_char(now() at time zone 'utc', 'YYYY-MM-DD'), 'victory', true)
+    from public.games where slug = 'system-breach'$$,
+  'a challenge score for the current UTC day is accepted');
+select throws_ok(
+  $$insert into public.scores (game_id, score, meta)
+    select id, 99999, '{"challenge":"2020-01-01"}'::jsonb from public.games where slug = 'system-breach'$$,
+  '22023', null, 'a score for a closed challenge day is rejected');
+select throws_ok(
+  $$insert into public.scores (game_id, score, meta)
+    select id, 1, '{"challenge":"demain"}'::jsonb from public.games where slug = 'system-breach'$$,
+  '22023', null, 'a malformed challenge day is rejected');
+select is(
+  (select score from public.daily_challenge_leaderboard(
+    (select id from public.games where slug = 'system-breach'),
+    to_char(now() at time zone 'utc', 'YYYY-MM-DD')) limit 1),
+  9000, 'the daily board ranks challenge runs of that day');
+select is(
+  (select score from public.game_leaderboard((select id from public.games where slug = 'system-breach')) limit 1),
+  5200, 'the all-time board ignores challenge runs');
+select is(
+  (select count(*)::int from public.claim_achievements(array['system-breach-clear'])),
+  0, 'a challenge victory does not unlock the standard clear achievement');
 reset role;
 
 -- Admin ---------------------------------------------------------------------

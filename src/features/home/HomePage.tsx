@@ -1,4 +1,4 @@
-import {Clock, Crosshair, Dices, Flame, Joystick, LayoutGrid, Sparkles, Star, Wand2} from 'lucide-react';
+import {Clock, Crosshair, Dices, Flame, Joystick, LayoutGrid, PartyPopper, Sparkles, Star, Wand2} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {usePlatform} from '@/app/PlatformProvider';
@@ -76,6 +76,7 @@ export default function HomePage() {
       continuePlaying,
       popular,
       fresh,
+      party: byGenre((g) => g.genre.includes('party')),
       retro: byGenre((g) => g.genre.includes('retro')),
       action: byGenre((g) => g.genre.includes('fps') || g.genre.includes('action')),
       arcade: byGenre((g) => g.genre.includes('arcade')),
@@ -148,6 +149,13 @@ export default function HomePage() {
         )
       )}
 
+      <GameRail
+        title="Entre amis"
+        subtitle="Sur un seul appareil, à plusieurs dans la même pièce"
+        icon={<PartyPopper size={20} />}
+        games={sections.party}
+        seeAllHref="/jeux?genre=party"
+      />
       <GameRail title="Jeux rétro" icon={<Joystick size={20} />} games={sections.retro} seeAllHref="/jeux?genre=retro" />
       <GameRail title="FPS & action" icon={<Crosshair size={20} />} games={sections.action} seeAllHref="/jeux?genre=action" />
       <GameRail title="Arcade" icon={<Star size={20} />} games={sections.arcade} seeAllHref="/jeux?genre=arcade" />

@@ -37,5 +37,14 @@ test('production build works under the Content-Security-Policy', async ({page}) 
   await expect(page.getByRole('heading', {level: 1, name: 'System Breach'})).toBeVisible();
   await page.goto('/jeux/system-breach?jouer=1&nointro');
   await expect(page.frameLocator('iframe[title="System Breach — jeu"]').getByRole('button', {name: /INITIATE STORY BREACH/})).toBeVisible({timeout: 20000});
+  // Party games (separate bundles, fonts and styles) under the same policy.
+  for (const [slug, title, start] of [
+    ['loups-de-minuit', 'Loups de Minuit', 'Distribuer les rôles'],
+    ['chroma-clash', 'Chroma Clash', 'Distribuer les cartes'],
+    ['micro-neon', 'Micro Néon', 'Commencer la soirée'],
+  ]) {
+    await page.goto(`/jeux/${slug}?jouer=1&nointro`);
+    await expect(page.frameLocator(`iframe[title="${title} — jeu"]`).getByRole('button', {name: start})).toBeVisible({timeout: 20000});
+  }
   expect(violations).toEqual([]);
 });
